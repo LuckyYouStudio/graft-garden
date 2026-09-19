@@ -32,6 +32,7 @@ SOURCES = [f"fruit-machine-ui/{name}" for name in PUBLIC] + [
     "reference-analysis/GRAFT_CONTRACT_VERIFICATION.json",
     "reference-analysis/GRAFT_BROWSER_VERIFICATION.json",
     "reference-analysis/GRAFT_DEPLOYMENT_VERIFICATION.json",
+    "reference-analysis/GRAFT_LAYOUT_VERIFICATION.json",
 ]
 out = ROOT / "artifacts"
 out.mkdir(exist_ok=True)

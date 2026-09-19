@@ -107,6 +107,7 @@
     var listeners = new Set(), pending = new Map();
     var latestSnapshot = null, hostApi = null, connection = null, connectPromise = null, sizeObserver = null;
     var destroyed = false, status = root.parent === root ? 'standalone' : 'connecting';
+    var lastReportedHeight = null;
     function emit(next) { listeners.forEach(function (listener) { try { listener(next); } catch (_) {} }); }
     function sessionItems() { return latestSnapshot && latestSnapshot.sessions && latestSnapshot.sessions.items || []; }
     function setSnapshot(snapshot) {
@@ -127,8 +128,16 @@
     function reportContentSize() {
       if (!hostApi || typeof hostApi.reportContentSize !== 'function' || !root.document) return;
       var body = root.document.body, doc = root.document.documentElement;
-      var minHeight = Math.ceil(Math.max(body ? body.scrollHeight : 0, body ? body.offsetHeight : 0, doc ? doc.scrollHeight : 0, doc ? doc.offsetHeight : 0));
-      if (minHeight > 0) void Promise.resolve(hostApi.reportContentSize({ minHeight: minHeight })).catch(function () {});
+      var surface = root.document.querySelector && root.document.querySelector('[data-game-content]');
+      // Report intrinsic game content, not document.scrollHeight (at least the
+      // old iframe height), otherwise a once-tall frame can never shrink.
+      var minHeight = surface
+        ? Math.ceil(Math.max(surface.scrollHeight, surface.offsetHeight, surface.getBoundingClientRect().bottom + (root.scrollY || 0)))
+        : Math.ceil(Math.max(body ? body.scrollHeight : 0, body ? body.offsetHeight : 0, doc ? doc.scrollHeight : 0, doc ? doc.offsetHeight : 0));
+      if (minHeight > 0 && minHeight !== lastReportedHeight) {
+        lastReportedHeight = minHeight;
+        void Promise.resolve(hostApi.reportContentSize({ minHeight: minHeight })).catch(function () { lastReportedHeight = null; });
+      }
     }
     function connect() {
       if (destroyed) return Promise.reject(new Error('Casino bridge destroyed'));
@@ -159,6 +168,8 @@
             sizeObserver = new root.ResizeObserver(reportContentSize);
             sizeObserver.observe(root.document.documentElement);
             if (root.document.body) sizeObserver.observe(root.document.body);
+            var surface = root.document.querySelector && root.document.querySelector('[data-game-content]');
+            if (surface) sizeObserver.observe(surface);
           }
           emit({ type: 'status', status: status });
           if (typeof options.onReady === 'function') options.onReady(hostApi);

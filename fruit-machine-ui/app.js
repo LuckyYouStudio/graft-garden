@@ -47,7 +47,7 @@ const words = {
     idle:'Choose orchard paths. Each season lights 4 nodes; path hits determine the harvest.',
     choose:'Choose an orchard path', ready:'Ready for three seasonal winds', start:'Grow & reveal', collect:'Collect harvest', next:'Continue',
     busy:'Waiting for winds', retry:'Sync result', cancel:'Request timeout cancellation', hold:'Click +{unit} · Hold to add',
-    unit:'Each press adds {unit} {symbol}', standalone:'Standalone demo · virtual credits', connected:'Casino SDK · {symbol}',
+    unit:'Each press adds {unit} {symbol}', standalone:'Demo · virtual credits', connected:'Casino SDK · {symbol}',
     connecting:'Connecting to Casino host', disconnected:'Connect your wallet in the host', setup:'Complete your wallet setup in the host',
     mismatch:'Restore your session key in the host', noBalance:'Waiting for host balance', wrongGame:'Host must load GraftGardenGame',
     noLimits:'Waiting for host risk limits', insufficient:'Insufficient balance; reduce your wager', limit:'Wager exceeds current host limits',
@@ -86,6 +86,20 @@ const handled = new Set();
 const reducedMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
 const pause = ms => new Promise(resolve => setTimeout(resolve, reducedMotion ? 1 : ms));
 function sound(name, arg) { try { window.FruitAudio?.[name]?.(arg); } catch {} }
+function syncViewport() {
+  const hostHeight = snapshot?.ui?.viewport?.availableHeight;
+  const available = Number.isFinite(hostHeight) && hostHeight > 0 ? hostHeight : window.innerHeight;
+  document.documentElement.dataset.density = available < 740 ? 'compact' : 'comfortable';
+  document.documentElement.dataset.shortViewport = available <= 520 ? 'true' : 'false';
+  document.documentElement.style.setProperty('--game-available-height', Math.round(available) + 'px');
+}
+// Keep the official widget in the footer instead of adding another page row.
+function positionJamBadge() {
+  const badge = $('#chain-jam-badge'), slot = $('#jamBadgeSlot');
+  if (!badge || !slot) return false;
+  if (badge.parentElement !== slot) slot.appendChild(badge);
+  return true;
+}
 function hostErrorMessage(error) { return window.GraftHostErrors.message(error, locale); }
 function reportHostError(error) {
   console.warn('Graft Garden host request:', error);
@@ -371,6 +385,7 @@ function recoverSnapshot() {
 }
 function receiveSnapshot(value) {
   snapshot=value;
+  syncViewport();
   if(lastRow) lastRow=value?.sessions?.items?.find(r=>r.sessionKey===lastRow.sessionKey) || lastRow;
   if(activeRound) {
     const row=value?.sessions?.items?.find(r=>r.sessionKey===activeRound.key);
@@ -445,4 +460,10 @@ $('#closeDialog').addEventListener('click',()=>$('#infoDialog').close());
 $('#infoDialog').addEventListener('click',event=>{if(event.target===$('#infoDialog'))$('#infoDialog').close();});
 document.addEventListener('keydown',event=>{if(event.code==='Space' && !event.repeat && !$('#infoDialog').open && !event.target.closest('button,input,textarea,select')){event.preventDefault();void start();}});
 renderBoard(); applyLocale();
+syncViewport();
+window.addEventListener('resize', syncViewport);
+if (!positionJamBadge()) {
+  const badgeObserver = new MutationObserver(() => { if (positionJamBadge()) badgeObserver.disconnect(); });
+  badgeObserver.observe(document.body, {childList:true});
+}
 bridge=window.FruitCasinoBridge.create({onSnapshot:receiveSnapshot,onReady:()=>{recoverSnapshot();renderNumbers();},onError:error=>{reportHostError(error);renderNumbers();}});

@@ -7,6 +7,7 @@
 ![Graft Garden 游戏界面](reference-analysis/graft-desktop.png)
 
 - 中文 / English 界面，支持桌面和手机。
+- 桌面使用果园与操作区双栏，手机使用紧凑单列；常见屏幕主要信息首屏可见，极小屏和矮横屏可滚动。模拟器中按宿主可用高度布局。
 - 八路下注默认零；支持长按加注、清除下注及收取奖励。
 - 格架 / 嫁接布局改变路径之间的关联；稳态收成 / 共振绽放提供不同返还分布。
 - 包含 Chain casino SDK 合约、Penpal 桥接、游戏清单及 Jam widget。
@@ -105,6 +106,8 @@ node scripts/graft-refresh.test.cjs
 ```
 
 也可设置 `PLAYWRIGHT_MODULE` 与 `CHROMIUM_PATH` 使用已有安装。仓库保留 SDK 自带的公开本地测试账户；本地部署文件、运行日志、依赖目录与环境变量文件不进入版本控制。
+
+布局检查可通过 `CHECK_SIMULATOR=1` 加入官方模拟器 iframe 场景，`GAME_URL` 可指定公开试玩地址。检查覆盖中英文屏幕尺寸、长金额历史记录、按钮点击区域与可视范围；记录见 [布局验证报告](reference-analysis/GRAFT_LAYOUT_VERIFICATION.json)。
 
 刷新回归覆盖整个模拟器页面刷新后恢复原局、继续下一局、旧合约缓存与未应用配置。模拟器只保存已点击 Restart 的配置；启动时会检查页面清单与合约是否匹配。历史日志完整解析后才发布，页面恢复时锁定原会话编号，等待同步期间保持下注禁用。设置 `GAME_URL=https://graft-garden.vercel.app/` 可对线上前端执行同一套本地链测试。回归测试使用独立的本地测试账户。
 

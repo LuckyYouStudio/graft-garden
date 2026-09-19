@@ -14,7 +14,7 @@ function environment(embedded = false) {
   context.window = context;
   context.parent = embedded ? {} : context;
   vm.runInNewContext(source, context);
-  return { api: context.FruitCasinoBridge, timers };
+  return { api: context.FruitCasinoBridge, timers, context };
 }
 const plain = value => JSON.parse(JSON.stringify(value));
 const state = (mode = 0, layout = 0, seasons = [0,0,0], hits = [3,3,3,3,0,0,0,0]) => encodeAbiParameters(stateAbi, [1, mode, layout, seasons, hits]);
@@ -113,6 +113,28 @@ async function main() {
   assert.equal(env.timers.size,0,'Destroy must clear pending timers');
   assert.equal(disconnects,1);
   await assert.rejects(bridge.waitForSettlement('destroy'),/destroyed/);
+
+  // A previously tall iframe must not force the new compact game to keep
+  // reporting that old viewport height back to the host forever.
+  const sizing = environment(true), reports = [], observed = [];
+  let contentHeight = 620, resized, disconnected = false;
+  const surface = { get scrollHeight() { return contentHeight; }, get offsetHeight() { return contentHeight; }, getBoundingClientRect: () => ({bottom:contentHeight}) };
+  sizing.context.document.body = {scrollHeight:1200,offsetHeight:1200};
+  sizing.context.document.documentElement = {scrollHeight:1200,offsetHeight:1200};
+  sizing.context.document.querySelector = selector => selector === '[data-game-content]' ? surface : null;
+  sizing.context.ResizeObserver = class {
+    constructor(callback) { resized = callback; }
+    observe(target) { observed.push(target); }
+    disconnect() { disconnected = true; }
+  };
+  const sizeBridge = sizing.api.create({sdk:{connectGameToHost(){return {promise:Promise.resolve({...host,reportContentSize:async value=>reports.push(value.minHeight)}),destroy(){}};}}});
+  await sizeBridge.connect();
+  assert.deepEqual(reports,[620]);
+  assert.ok(observed.includes(surface),'Content itself must be observed even if iframe/body height stays unchanged');
+  contentHeight=540; resized(); resized();
+  assert.deepEqual(reports,[620,540],'Compact content can shrink the frame, and identical reports are deduplicated');
+  sizeBridge.destroy();
+  assert.ok(disconnected);
   console.log('sdk-bridge: ABI parity, all 1024 layouts/outcomes, malformed states, wallet/session guards, cancellation, timeout and cleanup passed');
 }
 main().catch(error => { console.error(error); process.exitCode = 1; });
