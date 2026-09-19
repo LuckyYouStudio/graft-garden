@@ -4,3 +4,6 @@ README.md
 engine.js
 assets/
 _headers
+.env*
+.vercel/
+.gitignore

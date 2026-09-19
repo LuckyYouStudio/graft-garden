@@ -1,5 +1,7 @@
 # Graft Garden · 嫁接果园
 
+**[在线试玩 · Play now](https://graft-garden.vercel.app)**
+
 三季风向、八条果树路径的原创下注游戏，为 Chain Jam 制作。玩家分配路径下注，选择收成模式与嫁接布局，再观察三季节点依次点亮并结算。两种模式、两种布局及任意合法下注组合的理论 **RTP 均为 97%**。
 
 ![Graft Garden 游戏界面](reference-analysis/graft-desktop.png)
@@ -107,11 +109,15 @@ node scripts/graft-layout.test.cjs
 
 在 Vercel 导入此仓库时，将 **Root Directory** 设为 `fruit-machine-ui`，框架选择 **Other**。该目录中的 `vercel.json` 已设置跳过安装和构建、直接发布静态文件，并允许主机跨域读取游戏清单。
 
-也可以在完成 Vercel CLI 登录后，从游戏目录发布：
+生产项目已连接此 GitHub 仓库，`main` 分支的新提交会自动发布到上方试玩地址；项目根目录为 `fruit-machine-ui`。
+
+如需通过 CLI 手动发布，在完成登录后从仓库根目录链接现有项目：
 
 ```sh
-cd fruit-machine-ui
-npx vercel deploy --prod --yes --project graft-garden
+npx vercel link --yes --scope luck-you --project graft-garden
+npx vercel deploy --prod --yes --scope luck-you
 ```
 
 报名使用公开的生产域名。部署后应在未登录 Vercel 的浏览器中检查试玩、Jam 标识、`/game.manifest.json` 及 iframe 嵌入；本地 `.vercel` 连接信息不会提交到 Git。
+
+公开试玩的检查记录见 [部署验证报告](reference-analysis/GRAFT_DEPLOYMENT_VERIFICATION.json)。该网址运行独立试玩；通过 Chain 主机嵌入后使用 SDK 结算。

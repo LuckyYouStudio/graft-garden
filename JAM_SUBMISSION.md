@@ -7,7 +7,7 @@
 | 表单字段 | 内容 / 状态 |
 | --- | --- |
 | Game title | **Graft Garden / 嫁接果园** |
-| Game URL | 待部署到用户控制的公开地址；`http://localhost:4199/` 仅供本地测试 |
+| Game URL | [公开试玩网址](https://graft-garden.vercel.app) |
 | Declared RTP | **97%** |
 | Discord | 待填写用户的真实联系方式（官方必填） |
 | X / Telegram | 可选，由用户提供 |
@@ -78,19 +78,19 @@ node scripts/verify-graft.mjs
 | 要求 | 项目材料 / 交付前检查 |
 | --- | --- |
 | SDK 合约、通信和清单 | `GraftGardenGame.sol`、`sdk-bridge.js`、`game.manifest.json`；合约与完整 Host 浏览器联调已通过本地验证，记录见两份验证报告 |
-| 可快速加载的完整游戏 | 静态前端；公开部署后检查资源加载及移动端展示 |
+| 可快速加载的完整游戏 | Vercel 静态部署；已检查公开访问、资源加载、390px 手机布局 |
 | RTP 93–98%，实际奖表一致 | 声明 97%；上方解析证明及 512 结果独立枚举 |
 | 有下注、随机结果和返还 | 路径下注 → 三季风向 → 命中数结算 |
-| 公开 URL 可独立试玩 | 本地独立试玩入口已提供；公开托管待完成 |
+| 公开 URL 可独立试玩 | [Vercel 公开试玩](https://graft-garden.vercel.app) 已可直接访问 |
 | 新概念 | 三季风向与嫁接路径是本项目的参赛提案；原创性是否合格由评审认定 |
-| Jam widget | `index.html` 包含官方 widget 脚本；部署后检查该标签存在且资源可访问 |
+| Jam widget | `index.html` 包含官方 widget 脚本；线上标识已加载并可访问 |
 | 源码与正式表单 | 源码已在 [GitHub](https://github.com/LuckyYouStudio/graft-garden) 公开；真实联系方式与表单提交待完成 |
 
-## 尚待完成的外部步骤
+## 发布与提交状态
 
-1. 将 `fruit-machine-ui` 静态目录部署到用户控制的公开 HTTPS 地址，保持根路径清单和所有本地资源可访问。
-2. 在公开地址验证独立试玩、手机布局、英文/中文和 iframe 嵌入；确认 Jam widget 正常加载。
+1. 已部署 `fruit-machine-ui` 到 [https://graft-garden.vercel.app](https://graft-garden.vercel.app)，根路径清单和静态资源可公开访问。
+2. 已验证公开地址的独立试玩、手机布局、英文/中文、iframe 嵌入与 Jam widget；记录见 `reference-analysis/GRAFT_DEPLOYMENT_VERIFICATION.json`。
 3. 源码已在 [GitHub](https://github.com/LuckyYouStudio/graft-garden) 公开，包含前端、合约、数学验证、SDK 与运行说明；报名时将此地址填入 Source access。
 4. 填写真实 Discord 联系方式和源码地址，在官方表单提交。是否对接正式链、上架或获得奖项仍需主办方后续流程。
 
-源码已公开；这不表示已公开托管游戏、已提交报名或已通过审核。
+源码及试玩页面已公开。仍需填写真实 Discord 联系方式并提交官方表单；目前尚未提交报名或获得评审通过。

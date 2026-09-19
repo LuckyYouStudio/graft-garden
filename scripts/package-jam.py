@@ -21,6 +21,7 @@ SOURCES = [f"fruit-machine-ui/{name}" for name in PUBLIC] + [
     "casino-sdk/casino-sdk/simulator/scripts/verify-graft.mjs",
     "reference-analysis/GRAFT_CONTRACT_VERIFICATION.json",
     "reference-analysis/GRAFT_BROWSER_VERIFICATION.json",
+    "reference-analysis/GRAFT_DEPLOYMENT_VERIFICATION.json",
 ]
 out = ROOT / "artifacts"
 out.mkdir(exist_ok=True)

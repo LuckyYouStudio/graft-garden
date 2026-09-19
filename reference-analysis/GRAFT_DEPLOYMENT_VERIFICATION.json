@@ -1,0 +1,75 @@
+{
+  "url": "https://graft-garden.vercel.app",
+  "checkedAt": "2026-09-19T09:55:51.409Z",
+  "pageErrors": [],
+  "firstPartyHttpFailures": [],
+  "requestFailures": [],
+  "httpStatus": 200,
+  "initial": {
+    "title": "嫁接果园 · Chain Jam",
+    "rtp": "97.00%",
+    "visibleRtp": true,
+    "fruitIcons": 24,
+    "populatedFruitIcons": 24,
+    "wagers": [
+      "00",
+      "00",
+      "00",
+      "00",
+      "00",
+      "00",
+      "00",
+      "00"
+    ],
+    "totalStake": "0.00",
+    "balance": "661.00",
+    "standalone": "独立试玩 · 虚拟积分"
+  },
+  "widget": [
+    {
+      "text": "CHAIN JAM\nVOL.1",
+      "href": "https://jam.chain.wtf/?ref=widget",
+      "visible": true
+    }
+  ],
+  "afterBet": {
+    "total": "1.00",
+    "enabled": true
+  },
+  "round": {
+    "status": "本局下注路径未达到收成条件",
+    "prize": "0.00",
+    "balance": "660.00",
+    "winds": "Ⅰ · 3 → 6\nⅡ · 2 → 5\nⅢ · 3 → 6",
+    "hits": [
+      "0/3 命中",
+      "1/3 命中",
+      "3/3 命中",
+      "3/3 命中",
+      "3/3 命中",
+      "2/3 命中",
+      "0/3 命中",
+      "0/3 命中"
+    ]
+  },
+  "english": {
+    "title": "Graft Garden",
+    "lang": "en",
+    "mode": "Harvest\n2 hits ×1.52 · 3 hits ×3.20",
+    "note": "97% is a long-run theoretical return, not the chance of winning a round. Payouts include the stake."
+  },
+  "mobile": {
+    "viewport": 390,
+    "documentWidth": 390,
+    "bodyWidth": 390,
+    "rtp": "97.00%",
+    "nodeFruitCount": 24
+  },
+  "iframe": {
+    "loaded": true,
+    "title": "Graft Garden",
+    "rtp": "97.00%",
+    "sdkNote": "Generic embedding verified only; SDK-ready host handshake not part of this production smoke test."
+  },
+  "passed": true
+}
