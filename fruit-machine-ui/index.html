@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#241132"><title>嫁接果园 · Graft Garden</title>
+  <link rel="stylesheet" href="./styles.css?v=graft-fruit-nodes-1">
+</head>
+<body>
+<main class="game-shell">
+  <header class="topbar">
+    <div class="brand"><span class="brand-icon" aria-hidden="true">✿</span><div><span class="eyebrow">CHAIN JAM · ORIGINAL</span><h1 data-i18n="title">嫁接果园</h1></div></div>
+    <div class="top-actions">
+      <button id="soundButton" class="icon-button" aria-label="静音">♪</button>
+      <button id="rulesButton" class="icon-button" aria-label="玩法说明">?</button>
+      <div class="language-picker" id="languagePicker">
+        <button id="languageButton" class="language-button" aria-haspopup="true" aria-expanded="false">中文⌄</button>
+        <div id="languageMenu" class="language-menu" hidden><button data-locale="zh">中文</button><button data-locale="en">English</button></div>
+      </div>
+    </div>
+  </header>
+  <div class="tagline"><span data-i18n="tagline">种下路径，等待三季风来。</span><span class="rtp-pill">RTP <b id="rtpValue">97.00%</b></span></div>
+  <section class="cabinet">
+    <div class="account-row">
+      <div><span id="wealthTitle" data-i18n="balance">试玩财富</span><strong id="wealthValue">661.00</strong><small id="currencyLabel">CREDITS</small></div>
+      <div class="prize-panel"><span data-i18n="prize">本局收成</span><strong id="prizeValue">0.00</strong><small id="winSummary">—</small></div>
+    </div>
+    <div class="garden-header"><span class="eyebrow" data-i18n="garden">THE THREE-SEASON GARDEN</span><span id="layoutCaption">格架路径</span></div>
+    <div class="board-with-labels">
+    <div class="season-labels"><span data-i18n="spring">01 · 生根</span><span data-i18n="summer">02 · 开花</span><span data-i18n="autumn">03 · 结果</span></div>
+    <div class="garden-board" id="gardenBoard" role="img" aria-label="三季八节点果园；每季四个节点被风点亮">
+      <svg id="pathLines" viewBox="0 0 800 270" preserveAspectRatio="none" aria-hidden="true"></svg>
+      <div id="gardenNodes"></div>
+    </div>
+    </div>
+    <div class="wind-summary" id="windSummary"><span>Ⅰ · —</span><span>Ⅱ · —</span><span>Ⅲ · —</span></div>
+    <div class="round-status" id="roundStatus" role="status" aria-live="polite"></div>
+    <div class="recovery-actions" id="recoveryActions" hidden><button id="retryButton" data-i18n="retry">重新读取结果</button><button id="cancelButton" data-i18n="cancel">申请取消超时局</button></div>
+    <section class="choices">
+      <div class="mode-picker" role="group" aria-label="收成模式">
+        <button id="harvestButton" aria-pressed="true"><span data-i18n="harvest">稳态收成</span><small data-i18n="harvestHint">2 中 ×1.52 · 3 中 ×3.20</small></button>
+        <button id="bloomButton" aria-pressed="false"><span data-i18n="bloom">共振绽放</span><small data-i18n="bloomHint">仅 3 中 ×7.76</small></button>
+      </div>
+      <button id="layoutButton" class="layout-button"><span data-i18n="layout">路径布局</span><strong id="layoutValue">格架 ⇄</strong></button>
+    </section>
+    <div class="bet-toolbar"><span id="betHint">点击 +1 · 按住持续加注</span><button id="clearBetsButton" data-i18n="clear">清除全部</button></div>
+    <div class="pay-buttons" id="payButtons"></div>
+    <div class="path-detail" id="pathDetail"></div>
+    <div class="play-row"><div><span data-i18n="total">本局总注</span><strong id="totalStake">0.00</strong><small id="unitInfo"></small></div><button id="startButton"><span id="startLabel">开始收成</span><small id="startHint">请选择果树路径</small></button></div>
+  </section>
+  <footer>
+    <div class="footer-row"><span id="connectionLabel" class="connection-label"></span><button id="previewButton" data-i18n="preview">风向演示</button><button id="verifyButton" data-i18n="verify">结果验证</button></div>
+    <div class="history"><span data-i18n="history">最近收成</span><div id="historyStrip">—</div></div>
+    <p class="footnote" data-i18n="rtpNote">97% 为长期理论返奖率，不代表单局中奖概率。赔付包含本金。</p>
+  </footer>
+</main>
+<dialog id="infoDialog"><button id="closeDialog" class="dialog-close" aria-label="Close">×</button><p class="eyebrow">GRAFT GARDEN</p><h2 id="dialogTitle"></h2><div id="dialogBody"></div></dialog>
+<div id="toast" class="toast" role="status"></div>
+<script src="./vendor/penpal.min.js"></script>
+<script src="./sdk-bridge.js?v=graft-rtp97"></script>
+<script src="./graft-engine.js?v=graft-rtp97"></script>
+<script src="./audio.js"></script>
+<script src="./bet-controls.js?v=bet-hold-3"></script>
+<script src="./app.js?v=graft-rtp97"></script>
+<script async src="https://jam.chain.wtf/widget.js"></script>
+</body></html>

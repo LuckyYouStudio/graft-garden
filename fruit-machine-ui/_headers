@@ -1,0 +1,6 @@
+/game.manifest.json
+  Access-Control-Allow-Origin: *
+  Cache-Control: no-cache
+
+/*
+  X-Content-Type-Options: nosniff

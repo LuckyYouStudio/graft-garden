@@ -1,0 +1,24 @@
+{
+  "name": "@chain/local-verify-network",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Local simulator of the Verify Network VRF: deploys the real router on a local chain and runs a node that fulfills randomness requests with real ECVRF proofs.",
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "start": "tsx src/cli.ts",
+    "check-types": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@noble/curves": "^2.4.0",
+    "@noble/hashes": "^2.4.0",
+    "viem": "^2.47.6"
+  },
+  "devDependencies": {
+    "@types/node": "^24.12.4",
+    "tsx": "^4.21.0",
+    "typescript": "^7.0.2"
+  }
+}

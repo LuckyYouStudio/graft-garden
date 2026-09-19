@@ -1,0 +1,105 @@
+{
+  "game": "0x8a791620dd6260079bf849dc5567adc3f2fdc318",
+  "chainId": 31337,
+  "sourceBytecodeHash": "0x4b94b8a3867b92f34eb19b5b7e52673a668894b9b11e4a1272ee7fe8ffa66e96",
+  "rtpBps": 9700,
+  "exhaustiveOutcomeCalls": 2048,
+  "quoteFixtures": 48,
+  "invalidCases": 9,
+  "modes": [
+    {
+      "mode": 0,
+      "layout": 0,
+      "gas": {
+        "quoteCaps": "549294",
+        "quoteRiskParams": "549391",
+        "onSessionStart": "554791",
+        "onRandomness": "46890"
+      }
+    },
+    {
+      "mode": 0,
+      "layout": 1,
+      "gas": {
+        "quoteCaps": "551592",
+        "quoteRiskParams": "551689",
+        "onSessionStart": "557089",
+        "onRandomness": "50427"
+      }
+    },
+    {
+      "mode": 1,
+      "layout": 0,
+      "gas": {
+        "quoteCaps": "433218",
+        "quoteRiskParams": "433315",
+        "onSessionStart": "438715",
+        "onRandomness": "46774"
+      }
+    },
+    {
+      "mode": 1,
+      "layout": 1,
+      "gas": {
+        "quoteCaps": "435798",
+        "quoteRiskParams": "435895",
+        "onSessionStart": "441295",
+        "onRandomness": "50170"
+      }
+    }
+  ],
+  "sessions": [
+    {
+      "mode": 0,
+      "layout": 0,
+      "sessionId": "1",
+      "winds": [
+        6,
+        2,
+        7
+      ],
+      "payout": "532",
+      "openSessionGas": "1804292",
+      "fulfillmentGas": "136785"
+    },
+    {
+      "mode": 0,
+      "layout": 1,
+      "sessionId": "2",
+      "winds": [
+        1,
+        2,
+        5
+      ],
+      "payout": "570",
+      "openSessionGas": "1776962",
+      "fulfillmentGas": "140321"
+    },
+    {
+      "mode": 1,
+      "layout": 0,
+      "sessionId": "3",
+      "winds": [
+        1,
+        2,
+        0
+      ],
+      "payout": "1358",
+      "openSessionGas": "1421840",
+      "fulfillmentGas": "138984"
+    },
+    {
+      "mode": 1,
+      "layout": 1,
+      "sessionId": "4",
+      "winds": [
+        3,
+        7,
+        3
+      ],
+      "payout": "0",
+      "openSessionGas": "1424756",
+      "fulfillmentGas": "131749"
+    }
+  ]
+}

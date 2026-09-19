@@ -1,0 +1,3 @@
+const {chromium, launchOptions}=require('./browser-runtime.cjs');
+(async()=>{const b=await chromium.launch(launchOptions); const p=await b.newPage();await p.goto('http://localhost:4199',{waitUntil:'domcontentloaded'});await p.locator('#languageButton').click();await p.locator('[data-locale="en"]').click();for(const w of[320,360,390,768,1080]){await p.setViewportSize({width:w,height:900});console.log(w,await p.evaluate(()=>({width:innerWidth,scroll:document.documentElement.scrollWidth,overflow:[...document.querySelectorAll('button,h1,.lane-name')].filter(e=>e.scrollWidth>e.clientWidth+1).map(e=>e.id||e.className)})));}await b.close()})();
+

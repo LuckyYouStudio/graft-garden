@@ -1,0 +1,17 @@
+{
+  "testedAt": "2026-09-19T09:37:58.559Z",
+  "rtpBps": 9700,
+  "displayedRtp": "97.00%",
+  "testedPayouts": [
+    "1.52",
+    "3.20",
+    "7.76"
+  ],
+  "standalone": true,
+  "longHold": true,
+  "exactMoney": true,
+  "mobileWidth": 390,
+  "localSdkSession": "5",
+  "recoveredSession": "6",
+  "pageErrors": []
+}

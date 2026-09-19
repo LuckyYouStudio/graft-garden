@@ -1,0 +1,27 @@
+{
+  "schemaVersion": 1,
+  "gameId": "GraftGardenGame",
+  "apiVersion": 1,
+  "defaultLocale": "en",
+  "locales": {
+    "en": {
+      "name": "Graft Garden",
+      "description": "A three-season on-chain orchard where VRF winds connect fruit nodes into harvest paths."
+    },
+    "zh": {
+      "name": "嫁接果园",
+      "description": "三季果园由链上风向连接，随机形成嫁接路径并结算收成。"
+    }
+  },
+  "presentation": {
+    "mode": "full-iframe",
+    "hostPanels": { "openSession": false, "history": false, "status": false }
+  },
+  "capabilities": {
+    "openSession": true,
+    "submitAction": false,
+    "forfeitExpiredSession": false,
+    "cancelStuckRandomness": true,
+    "resize": true
+  }
+}

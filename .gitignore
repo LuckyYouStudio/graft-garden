@@ -1,0 +1,34 @@
+# Dependencies, build output and machine-local state
+node_modules/
+dist/
+.cache/
+.vite/
+__pycache__/
+*.py[cod]
+*.log
+.DS_Store
+Thumbs.db
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+
+# Downloaded bundles and generated release archives
+/artifacts/
+/*.zip
+/*.tgz
+/graft-math.json
+
+# Local chain deployments change on every simulator boot
+**/local-node/deployed.json
+
+# Keep published game screenshots/reports, not temporary reference footage
+/reference-analysis/*
+!/reference-analysis/GRAFT_BROWSER_VERIFICATION.json
+!/reference-analysis/GRAFT_CONTRACT_VERIFICATION.json
+!/reference-analysis/graft-desktop.png
+!/reference-analysis/graft-mobile-en.png
+!/reference-analysis/graft-fruit-nodes-desktop.png
+!/reference-analysis/graft-fruit-nodes-mobile.png
+/scripts/inspect-graft-host.cjs
