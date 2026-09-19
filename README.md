@@ -102,3 +102,16 @@ node scripts/graft-layout.test.cjs
 也可设置 `PLAYWRIGHT_MODULE` 与 `CHROMIUM_PATH` 使用已有安装。仓库保留 SDK 自带的公开本地测试账户；本地部署文件、运行日志、依赖目录与环境变量文件不进入版本控制。
 
 公开托管时上传整个 `fruit-machine-ui` 目录，并保留清单的 CORS 响应头与 iframe 嵌入能力。项目附带 `_headers` 和 `vercel.json` 配置。参赛材料及外部步骤见 [Chain Jam 提交说明](JAM_SUBMISSION.md)，官方要求见 [Chain Jam](https://jam.chain.wtf/#submit)。
+
+## Vercel 部署
+
+在 Vercel 导入此仓库时，将 **Root Directory** 设为 `fruit-machine-ui`，框架选择 **Other**。该目录中的 `vercel.json` 已设置跳过安装和构建、直接发布静态文件，并允许主机跨域读取游戏清单。
+
+也可以在完成 Vercel CLI 登录后，从游戏目录发布：
+
+```sh
+cd fruit-machine-ui
+npx vercel deploy --prod --yes --project graft-garden
+```
+
+报名使用公开的生产域名。部署后应在未登录 Vercel 的浏览器中检查试玩、Jam 标识、`/game.manifest.json` 及 iframe 嵌入；本地 `.vercel` 连接信息不会提交到 Git。

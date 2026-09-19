@@ -8,7 +8,7 @@ ROOT = Path(__file__).resolve().parents[1]
 PUBLIC = [
     "index.html", "styles.css", "app.js", "graft-engine.js", "audio.js",
     "bet-controls.js", "sdk-bridge.js", "game.manifest.json",
-    "_headers", "vercel.json", "vendor/penpal.min.js", "vendor/penpal.LICENSE.txt"
+    "_headers", "vercel.json", ".vercelignore", "vendor/penpal.min.js", "vendor/penpal.LICENSE.txt"
 ]
 SOURCES = [f"fruit-machine-ui/{name}" for name in PUBLIC] + [
     "fruit-machine-ui/README.md", "fruit-machine-ui/sdk-bridge.test.cjs",

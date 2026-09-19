@@ -1,0 +1,6 @@
+# Deploy the playable static game, leaving reference code and tests in GitHub.
+README.md
+*.test.cjs
+engine.js
+assets/
+_headers
