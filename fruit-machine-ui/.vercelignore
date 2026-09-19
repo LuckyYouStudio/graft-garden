@@ -3,6 +3,7 @@ README.md
 *.test.cjs
 engine.js
 assets/
+locales/
 _headers
 .env*
 .vercel/

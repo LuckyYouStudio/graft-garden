@@ -5,75 +5,13 @@ const $$ = selector => Array.from(document.querySelectorAll(selector));
 const hosted = window.parent !== window;
 const fruit = ['🍒','🍇','🍐','🍉','🫐','🍋','🍊','🍎'];
 const colors = ['#ff9da7','#c5a0f7','#d6e792','#82dfac','#92b6ee','#f4dd84','#f5b58c','#ec8dba'];
-const words = {
-  zh: {
-    title:'嫁接果园', tagline:'种下路径，等待三季风来。', balance:'余额', hostBalance:'余额',
-    prize:'本局收成', garden:'三季果园 · 8 条路径', spring:'01 · 生根', summer:'02 · 开花', autumn:'03 · 结果',
-    harvest:'稳态收成', bloom:'共振绽放', harvestHint:'2 中 ×1.52 · 3 中 ×3.20', bloomHint:'仅 3 中 ×7.76',
-    layout:'路径布局', trellis:'格架', graft:'嫁接', clear:'清除全部', total:'本局总注', preview:'风向演示',
-    verify:'结果验证', history:'最近收成', rtpTitle:'理论返奖率（RTP）', rtpNote:'97% 为长期理论返奖率，不代表单局中奖概率。赔付包含本金。',
-    idle:'选择果树路径；三季各点亮 4 个节点，按路径命中次数支付收成。',
-    choose:'请选择果树路径', ready:'准备好迎接三季风向', start:'开始收成', collect:'收取收成', next:'继续',
-    busy:'等待风向', retry:'重新读取结果', cancel:'申请取消超时局', hold:'点击 +{unit} · 按住持续加注',
-    unit:'每次加注 {unit} {symbol}', standalone:'独立试玩 · 虚拟积分', connected:'Casino SDK · {symbol}',
-    connecting:'正在连接 Casino 主机', disconnected:'请在主机连接钱包', setup:'请先完成主机钱包设置',
-    mismatch:'请在主机恢复会话密钥', noBalance:'等待主机余额', wrongGame:'主机未加载 GraftGardenGame',
-    noLimits:'等待主机风险额度', insufficient:'余额不足，请减少下注', limit:'下注超出主机当前额度',
-    opening:'正在提交本局下注…', pending:'下注已提交，等待链上随机数；请勿重复下注。',
-    wind:'第 {season} 季风向已锁定：从节点 {node} 开始', reveal:'三季风向到齐，正在揭示路径…',
-    won:'收成 {amount} · {count} 条下注路径命中', lost:'本局下注路径未达到收成条件',
-    collected:'收成已转入余额', settled:'收成已由合约结算，余额以主机为准',
-    cleared:'全部下注已清除', previewing:'风向演示中 · 不下注、不计入余额',
-    previewDone:'演示结束 · 三季风窗与路径已显示', waitingLong:'结果尚未同步。可重新读取；超时取消由主机校验。',
-    roundCancelled:'本局已取消；余额处理以合约和主机为准', roundForfeited:'本局已结束；按合约规则处理余额',
-    failed:'操作失败：{error}', restored:'正在恢复未完成的链上局', errorResult:'结果数据不完整或不匹配，请重新同步。',
-    noResult:'完成一局后，可在这里查看风向、命中、赔付及会话信息。',
-    rulesTitle:'三季风向，八条果树路径', trace:'{fruit} 路径：{nodes} · {hits}', traceHint:'加注可查看该路径的连接',
-    hits:'{n}/3 命中', credits:'积分', mute:'关闭音效', unmute:'开启音效',
-    verifyUnavailable:'主机没有提供 VRF 验证接口；会话原始数据如下。', noVrf:'本地模拟器未使用 Verify Network VRF。',
-    verified:'主机报告 VRF 验证通过', unverified:'VRF 尚未验证或验证未通过',
-    rules:'先选择模式与布局，再点击或长按底部果树按钮加注。初始下注均为 0。每条路径穿过生根、开花、结果三个季节的各一个节点。每季独立随机选一个起点，在 8 个节点中点亮连续 4 个。路径经过的亮点数就是命中次数。',
-    rules2:'格架：路径三季沿同一编号。嫁接：第二、第三季重新连接节点，改变多条路径之间的相关性。单路径的命中概率保持不变。先展示每季风窗，再揭示已下注路径；主界面节点仅供展示。',
-    rules3:'每条路径命中 0 / 1 / 2 / 3 次的概率是 12.5% / 37.5% / 37.5% / 12.5%。稳态收成有赔付的概率为 50%，共振绽放为 12.5%；有赔付不等于净盈利。多路下注的综合命中率由布局和下注组合决定。',
-    rules4:'稳态收成：3/8 × 1.52 + 1/8 × 3.20 = 0.97。共振绽放：1/8 × 7.76 = 0.97。任意合法下注组合均有 97% 理论 RTP。金额用整数最小单位计算，避免小额赔付被截断。独立试玩采用浏览器随机数；主机模式只展示合约结果。',
-    ruleHit:'命中次数', ruleChance:'概率', noPay:'无赔付'
-  },
-  en: {
-    title:'Graft Garden', tagline:'Plant a path. Let three seasons unfold.', balance:'Balance', hostBalance:'Balance',
-    prize:'Round harvest', garden:'THREE SEASONS · EIGHT PATHS', spring:'01 · ROOT', summer:'02 · BLOOM', autumn:'03 · FRUIT',
-    harvest:'Harvest', bloom:'Bloom', harvestHint:'2 hits ×1.52 · 3 hits ×3.20', bloomHint:'3 hits only ×7.76',
-    layout:'Path layout', trellis:'Trellis', graft:'Graft', clear:'Clear all', total:'Total wager', preview:'Wind preview',
-    verify:'Verify result', history:'Recent harvests', rtpTitle:'Theoretical return to player (RTP)', rtpNote:'97% is a long-run theoretical return, not the chance of winning a round. Payouts include the stake.',
-    idle:'Choose orchard paths. Each season lights 4 nodes; path hits determine the harvest.',
-    choose:'Choose an orchard path', ready:'Ready for three seasonal winds', start:'Grow & reveal', collect:'Collect harvest', next:'Continue',
-    busy:'Waiting for winds', retry:'Sync result', cancel:'Request timeout cancellation', hold:'Click +{unit} · Hold to add',
-    unit:'Each press adds {unit} {symbol}', standalone:'Demo · virtual credits', connected:'Casino SDK · {symbol}',
-    connecting:'Connecting to Casino host', disconnected:'Connect your wallet in the host', setup:'Complete your wallet setup in the host',
-    mismatch:'Restore your session key in the host', noBalance:'Waiting for host balance', wrongGame:'Host must load GraftGardenGame',
-    noLimits:'Waiting for host risk limits', insufficient:'Insufficient balance; reduce your wager', limit:'Wager exceeds current host limits',
-    opening:'Submitting this wager…', pending:'Wager submitted; waiting for on-chain randomness. Do not resubmit.',
-    wind:'Season {season} locked: wind starts at node {node}', reveal:'All three winds are in. Revealing your paths…',
-    won:'Harvest {amount} · {count} wagered paths paid', lost:'No wagered path reached the harvest threshold',
-    collected:'Harvest added to your balance', settled:'Settled by the contract. Balance follows the host.',
-    cleared:'All bets cleared', previewing:'Wind preview · no wager or balance change',
-    previewDone:'Preview complete · seasonal windows and paths are visible', waitingLong:'Result not synced yet. Retry sync; the host checks timeout cancellation.',
-    roundCancelled:'Round cancelled; balance handling follows the contract and host', roundForfeited:'Round ended under the contract rules',
-    failed:'Operation failed: {error}', restored:'Restoring the unfinished on-chain round', errorResult:'Incomplete or mismatched result. Please sync again.',
-    noResult:'Complete a round to inspect winds, hits, payout and session details.',
-    rulesTitle:'Three seasons. Eight orchard paths.', trace:'{fruit} path: {nodes} · {hits}', traceHint:'Add a wager to trace its path',
-    hits:'{n}/3 hits', credits:'credits', mute:'Mute sound', unmute:'Enable sound',
-    verifyUnavailable:'The host does not expose VRF verification. Raw session data is shown below.', noVrf:'The local simulator does not use Verify Network VRF.',
-    verified:'Host reports that VRF verification passed', unverified:'VRF unverified or verification failed',
-    rules:'Choose a mode and layout, then click or hold a fruit button to wager. All wagers start at zero. Each path passes through one node in each of three seasons. Every season independently selects a random starting node and lights four consecutive nodes out of eight. The number of lit nodes along a path is its hit count.',
-    rules2:'Trellis follows the same node number in all seasons. Graft reconnects the second and third seasons, changing correlations between paths while keeping each path’s hit probabilities unchanged. The board shows each seasonal window, then the wagered paths. Board nodes are display-only.',
-    rules3:'A path has 0 / 1 / 2 / 3 hits with probabilities 12.5% / 37.5% / 37.5% / 12.5%. A payout occurs 50% of the time in Harvest and 12.5% in Bloom. A payout is not necessarily a net profit. Combined hit rates depend on your layout and allocation.',
-    rules4:'Harvest: 3/8 × 1.52 + 1/8 × 3.20 = 0.97. Bloom: 1/8 × 7.76 = 0.97. Every valid allocation has 97% theoretical RTP. Integer base units keep small payouts exact. Standalone uses browser randomness; host mode displays contract outcomes only.',
-    ruleHit:'Hits', ruleChance:'Probability', noPay:'No payout'
-  }
-};
-let locale = 'zh';
-try { locale = localStorage.getItem('graft.locale') === 'en' ? 'en' : 'zh'; } catch {}
-const t = (key, vars = {}) => Object.entries(vars).reduce((s, [k,v]) => s.replaceAll('{' + k + '}', String(v)), words[locale][key] || key);
+const I18N = window.GraftI18n;
+const languageInfo = code => I18N.locales.find(item => item.code === code);
+let chosenLocale = null;
+try { chosenLocale = I18N.normalize(localStorage.getItem('graft.locale')); } catch {}
+let locale = chosenLocale || (navigator.languages || [navigator.language]).map(I18N.normalize).find(Boolean) || 'en';
+let hostLocaleApplied = false;
+const t = (key, vars = {}) => I18N.t(locale, key, vars);
 const counts = Array(8).fill(0);
 let mode = 'harvest', layout = 'trellis', focusLane = 0;
 // Standalone demo credits mirror the simulator's one-million test allowance.
@@ -82,6 +20,7 @@ const INITIAL_DEMO_BALANCE = 1_000_000n * 100n;
 let demoBalance = INITIAL_DEMO_BALANCE, prize = 0n, stage = 'idle', snapshot = null, bridge = null;
 let activeRound = null, lastRound = null, lastResult = null, lastRow = null, revealedSeasons = 0;
 let betControls, history = [], statusKey = 'idle', statusVars = {}, errorText = '', waitVersion = 0, recovering = false;
+let lastHostError = null;
 const handled = new Set();
 const reducedMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
 const pause = ms => new Promise(resolve => setTimeout(resolve, reducedMotion ? 1 : ms));
@@ -102,6 +41,7 @@ function positionJamBadge() {
 }
 function hostErrorMessage(error) { return window.GraftHostErrors.message(error, locale); }
 function reportHostError(error) {
+  lastHostError = error;
   console.warn('Graft Garden host request:', error);
   status('failed', {error:hostErrorMessage(error)}, true);
 }
@@ -193,7 +133,7 @@ function renderNumbers() {
   $('#previewButton').disabled = busy(); $('#languageButton').disabled = busy();
   $('#harvestButton').setAttribute('aria-pressed', String(mode === 'harvest'));
   $('#bloomButton').setAttribute('aria-pressed', String(mode === 'bloom'));
-  $('#layoutValue').textContent = t(layout) + ' ⇄'; $('#layoutCaption').textContent = t(layout);
+  $('#layoutValue').textContent = t(layout); $('#layoutCaption').textContent = t(layout);
   $$('.pay-button').forEach((button,i) => {
     button.disabled = busy();
     button.querySelector('.lane-stake').textContent = String(counts[i]).padStart(2,'0');
@@ -222,7 +162,7 @@ function renderPaths(round = null) {
       const cell = $('.garden-node[data-season="' + season + '"][data-node="' + node + '"]');
       cell.querySelector('.node-fruit').textContent = fruit[lane];
       cell.dataset.lane = lane;
-      cell.setAttribute('aria-label', fruit[lane] + ' · ' + (locale === 'zh' ? '果树 ' : 'Path ') + (lane + 1) + ' · ' + (locale === 'zh' ? '节点 ' : 'Node ') + (node + 1));
+      cell.setAttribute('aria-label', fruit[lane] + ' · ' + (t('path') + ' ') + (lane + 1) + ' · ' + (t('node') + ' ') + (node + 1));
     }
   }
   $('#pathLines').innerHTML = Array.from({length:8},(_,lane) => {
@@ -246,11 +186,11 @@ function paintSeason(season, wind, final) {
 function clearBoard() {
   $$('.garden-node').forEach(node => node.classList.remove('lit','pulse','trace'));
   Array.from($('#windSummary').children).forEach((node,i) => { node.textContent=['Ⅰ','Ⅱ','Ⅲ'][i]+' · —'; node.classList.remove('revealed'); });
-  $$('.lane-hit').forEach(node => { node.textContent='—'; }); $$('.pay-button').forEach(node => node.classList.remove('winner'));
+  $$('.lane-hit').forEach(node => { node.textContent='—'; delete node.dataset.hits; }); $$('.pay-button').forEach(node => node.classList.remove('winner'));
 }
 function renderBets() {
   betControls?.destroy();
-  $('#payButtons').innerHTML = fruit.map((icon,i) => '<button class="pay-button" data-lane="' + i + '" aria-label="' + icon + ' '+ (i+1) + '"><span class="fruit">' + icon + '</span><span class="lane-name">' + (locale === 'zh' ? '果树 ' : 'PATH ') + (i+1) + '</span><span class="lane-stake">00</span><span class="lane-hit">—</span></button>').join('');
+  $('#payButtons').innerHTML = fruit.map((icon,i) => '<button class="pay-button" data-lane="' + i + '"><span class="fruit">' + icon + '</span><span class="lane-name">' + t('laneName',{n:i+1}) + '</span><span class="lane-stake">00</span><span class="lane-hit">—</span></button>').join('');
   betControls = window.bindBetControls({
     buttons:$$('.pay-button'), canBet:() => !busy() && !$('#infoDialog').open,
     increment: i => {
@@ -262,11 +202,29 @@ function renderBets() {
   });
 }
 function applyLocale() {
-  document.documentElement.lang = locale === 'zh' ? 'zh-CN' : 'en'; document.title=t('title')+' · Chain Jam';
+  document.documentElement.lang = languageInfo(locale).htmlLang;
+  document.documentElement.dataset.language = locale;
+  document.title=t('title')+' · Chain Jam';
   $$('[data-i18n]').forEach(node => { node.textContent=t(node.dataset.i18n); });
-  $('#languageButton').textContent=locale==='zh'?'中文⌄':'English⌄'; $('#rulesButton').setAttribute('aria-label',t('rulesTitle'));
+  $('#languageButton').textContent=languageInfo(locale).short+'⌄';
+  $('#languageButton').title=languageInfo(locale).label;
+  $('#languageButton').setAttribute('aria-label',t('language')+': '+languageInfo(locale).label);
+  $('#languageMenu').setAttribute('aria-label',t('language'));
+  $$('[data-locale]').forEach(button => button.setAttribute('aria-selected',String(button.dataset.locale===locale)));
+  $('#rulesButton').setAttribute('aria-label',t('rulesTitle'));
+  $('#closeDialog').setAttribute('aria-label',t('close'));
+  $('.mode-picker').setAttribute('aria-label',t('modeChoice'));
   $('#gardenBoard').setAttribute('aria-label',t('garden'));
-  renderBets(); renderNumbers(); renderPaths(); status(statusKey,statusVars,Boolean(errorText));
+  if (!betControls) renderBets();
+  $$('.pay-button').forEach((button,index) => {
+    button.querySelector('.lane-name').textContent=t('laneName',{n:index+1});
+    button.setAttribute('aria-label',fruit[index]+' '+t('laneName',{n:index+1}));
+    const hit=button.querySelector('.lane-hit');
+    if (hit.dataset.hits!==undefined) hit.textContent=t('hits',{n:hit.dataset.hits});
+  });
+  renderNumbers(); renderPaths();
+  const variables=statusKey==='failed' && lastHostError ? {error:hostErrorMessage(lastHostError)} : statusVars;
+  status(statusKey,variables,Boolean(errorText));
 }
 async function animate(result, round, preview = false) {
   stage='animating'; renderNumbers(); clearBoard(); renderPaths(round);
@@ -281,6 +239,7 @@ async function animate(result, round, preview = false) {
   for (let lane=0;lane<8;lane++) {
     const button=$$('.pay-button')[lane];
     button.querySelector('.lane-hit').textContent=t('hits',{n:result.hits[lane]});
+    button.querySelector('.lane-hit').dataset.hits=String(result.hits[lane]);
     button.classList.toggle('winner',round.stakes[lane]>0n && G.payoutFor(round.mode,result.hits[lane],round.stakes[lane])>0n);
     if (round.stakes[lane] === 0n) continue;
     result.paths[lane].forEach(point => {
@@ -390,6 +349,11 @@ function recoverSnapshot() {
 }
 function receiveSnapshot(value) {
   snapshot=value;
+  if (!hostLocaleApplied && snapshot?.ui?.locale) {
+    const hostLocale=I18N.normalize(snapshot.ui.locale);
+    hostLocaleApplied=true;
+    if (!chosenLocale && hostLocale && hostLocale!==locale) { locale=hostLocale; applyLocale(); }
+  }
   syncViewport();
   if(lastRow) lastRow=value?.sessions?.items?.find(r=>r.sessionKey===lastRow.sessionKey) || lastRow;
   if(activeRound) {
@@ -455,12 +419,39 @@ $('#cancelButton').addEventListener('click',async()=>{
   try {await bridge.cancelStuckRandomness(activeRound.sessionId);stage='waiting';status('pending');void waitForRound(activeRound);}
   catch(error){reportHostError(error);} renderNumbers();
 });
-$('#languageButton').addEventListener('click',()=>{const menu=$('#languageMenu');menu.hidden=!menu.hidden;$('#languageButton').setAttribute('aria-expanded',String(!menu.hidden));});
-$$('[data-locale]').forEach(button=>button.addEventListener('click',()=>{
-  locale=button.dataset.locale;try{localStorage.setItem('graft.locale',locale);}catch{}
-  $('#languageMenu').hidden=true;$('#languageButton').setAttribute('aria-expanded','false');applyLocale();
-}));
-document.addEventListener('click',event=>{if(!event.target.closest('#languagePicker')){$('#languageMenu').hidden=true;$('#languageButton').setAttribute('aria-expanded','false');}});
+function toggleLanguageMenu(open, focus = false) {
+  $('#languageMenu').hidden=!open;
+  $('#languageButton').setAttribute('aria-expanded',String(open));
+  if (focus) {
+    if (open) $('#languageMenu [data-locale="'+locale+'"]').focus();
+    else $('#languageButton').focus();
+  }
+}
+$('#languageMenu').innerHTML=I18N.locales.map(item=>'<button type="button" role="option" data-locale="'+item.code+'" lang="'+item.htmlLang+'" tabindex="-1">'+item.label+'</button>').join('');
+$('#languageButton').addEventListener('click',()=>toggleLanguageMenu($('#languageMenu').hidden,true));
+$('#languageButton').addEventListener('keydown',event=>{
+  if (event.key==='ArrowDown' || event.key==='ArrowUp') { event.preventDefault(); toggleLanguageMenu(true,true); }
+});
+$('#languageMenu').addEventListener('click',event=>{
+  const button=event.target.closest('[data-locale]');
+  if (!button || busy()) return;
+  const selected=I18N.normalize(button.dataset.locale);
+  if (!selected) return;
+  locale=selected; chosenLocale=selected;
+  try{localStorage.setItem('graft.locale',locale);}catch{}
+  toggleLanguageMenu(false,true); applyLocale();
+});
+$('#languageMenu').addEventListener('keydown',event=>{
+  if (event.key==='Escape') { event.preventDefault(); event.stopPropagation(); toggleLanguageMenu(false,true); return; }
+  if (!['ArrowDown','ArrowUp','Home','End'].includes(event.key)) return;
+  event.preventDefault();
+  const options=$$('#languageMenu [data-locale]');
+  const current=options.indexOf(document.activeElement);
+  const next=event.key==='Home' ? 0 : event.key==='End' ? options.length-1 : (current+(event.key==='ArrowDown'?1:-1)+options.length)%options.length;
+  options[next].focus();
+});
+document.addEventListener('click',event=>{if(!event.target.closest('#languagePicker'))toggleLanguageMenu(false);});
+document.addEventListener('focusin',event=>{if(!event.target.closest('#languagePicker'))toggleLanguageMenu(false);});
 $('#closeDialog').addEventListener('click',()=>$('#infoDialog').close());
 $('#infoDialog').addEventListener('click',event=>{if(event.target===$('#infoDialog'))$('#infoDialog').close();});
 document.addEventListener('keydown',event=>{if(event.code==='Space' && !event.repeat && !$('#infoDialog').open && !event.target.closest('button,input,textarea,select')){event.preventDefault();void start();}});

@@ -8,12 +8,18 @@ Graft Garden is an original wagering game built for Chain Jam: eight fruit paths
 
 ![Graft Garden game interface](reference-analysis/graft-desktop-en.png)
 
-- English and Chinese interfaces, with desktop and mobile layouts.
+- English, German, Spanish, Russian, Portuguese, Vietnamese and Chinese interfaces, with desktop and mobile layouts.
 - A two-column orchard and control panel on desktop, and a compact single column on phones. Main controls stay visible on common screens; very small screens and short landscape viewports can scroll. The simulator view adapts to the host's available height.
 - Eight betting lanes start at zero. Press and hold to add bets, clear all bets, or collect a completed harvest.
 - Trellis and Graft layouts change how paths hit together. Harvest and Bloom modes offer different payout distributions.
 - Includes a Chain casino SDK contract, Penpal bridge, game manifest, and Jam widget.
 - Runs as a standalone static demo. When embedded in the official simulator, the game uses authoritative settlement results from the host and contract.
+
+## Interface languages
+
+The game supports English (`en`), Deutsch (`de`), Español (`es`), Русский (`ru`), Português (`pt`), Tiếng Việt (`vi`) and 中文 (`zh`). It remembers an explicit language choice, otherwise uses a supported browser language; an embedded host can supply the initial locale. Controls, rules, result messages, common errors and manifest metadata are translated. Changing language preserves wagers and the current harvest; payouts and token amounts use the same exact number format throughout.
+
+Translation sources are in `fruit-machine-ui/locales/*.json`. After editing them, run `python scripts/build-locales.py` from the repository root to check key/placeholder completeness and regenerate the committed `i18n.js` browser bundle. `node scripts/graft-locales.test.cjs` checks all seven languages, persistence, keyboard navigation and desktop/mobile layouts (requires Playwright and the local game server).
 
 ## Quick start
 

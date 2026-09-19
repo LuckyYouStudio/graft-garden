@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <meta name="theme-color" content="#241132"><title>嫁接果园 · Graft Garden</title>
-  <link rel="stylesheet" href="./styles.css?v=rtp-label-1">
+  <link rel="stylesheet" href="./styles.css?v=languages-1">
 </head>
 <body>
 <main class="game-shell" data-game-content>
@@ -14,8 +14,8 @@
       <button id="soundButton" class="icon-button" aria-label="静音">♪</button>
       <button id="rulesButton" class="icon-button" aria-label="玩法说明">?</button>
       <div class="language-picker" id="languagePicker">
-        <button id="languageButton" class="language-button" aria-haspopup="true" aria-expanded="false">中文⌄</button>
-        <div id="languageMenu" class="language-menu" hidden><button data-locale="zh">中文</button><button data-locale="en">English</button></div>
+        <button id="languageButton" class="language-button" aria-haspopup="listbox" aria-controls="languageMenu" aria-expanded="false">EN⌄</button>
+        <div id="languageMenu" class="language-menu" role="listbox" hidden></div>
       </div>
     </div>
   </header>
@@ -64,7 +64,8 @@
 <script src="./graft-engine.js?v=graft-rtp97"></script>
 <script src="./audio.js"></script>
 <script src="./bet-controls.js?v=bet-hold-3"></script>
-<script src="./host-errors.js?v=refresh-fix-1"></script>
-<script src="./app.js?v=rtp-label-1"></script>
+<script src="./i18n.js?v=languages-1"></script>
+<script src="./host-errors.js?v=languages-1"></script>
+<script src="./app.js?v=languages-1"></script>
 <script async src="https://jam.chain.wtf/widget.js"></script>
 </body></html>

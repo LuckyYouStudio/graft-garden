@@ -5,7 +5,7 @@ const errors=[];
 (async()=>{
  const browser=await chromium.launch(launchOptions);
  try {
-  const page=await browser.newPage({viewport:{width:1080,height:1080},reducedMotion:'reduce'});
+  const page=await browser.newPage({viewport:{width:1080,height:1080},reducedMotion:'reduce',locale:'zh-CN'});
   page.on('pageerror',e=>errors.push(e.message));
   // Force a known wind triple only in this test browser, never in production.
   await page.addInitScript(()=>{crypto.getRandomValues=array=>{array.fill(0);return array;};});
@@ -62,6 +62,7 @@ const errors=[];
   const deployed=JSON.parse(fs.readFileSync('casino-sdk/casino-sdk/simulator/local-node/deployed.json','utf8'));
   const addr=deployed.games.find(g=>g.name==='GraftGardenGame').address;
   const host=await browser.newPage({viewport:{width:1440,height:1100},reducedMotion:'reduce'});
+  await host.addInitScript(()=>localStorage.setItem('graft.locale','zh'));
   host.on('pageerror',e=>errors.push(e.message));
   await host.goto('http://localhost:3300/?game='+encodeURIComponent('http://localhost:4199/')+'&gameAddress='+addr,{waitUntil:'domcontentloaded'});
   const frame=host.frameLocator('iframe');

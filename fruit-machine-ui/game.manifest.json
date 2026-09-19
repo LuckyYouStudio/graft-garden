@@ -11,11 +11,35 @@
     "zh": {
       "name": "嫁接果园",
       "description": "三季果园由链上风向连接，随机形成嫁接路径并结算收成。"
+    },
+    "de": {
+      "name": "Graft Garden",
+      "description": "Wähle Pfade. Pro Jahreszeit leuchten 4 Knoten; Treffer bestimmen die Ernte."
+    },
+    "es": {
+      "name": "Graft Garden",
+      "description": "Elige rutas. Cada estación ilumina 4 nodos; los aciertos determinan la cosecha."
+    },
+    "ru": {
+      "name": "Graft Garden",
+      "description": "Выберите пути. В каждом сезоне светятся 4 узла; попадания определяют урожай."
+    },
+    "pt": {
+      "name": "Graft Garden",
+      "description": "Escolha caminhos. Cada estação ilumina 4 nós; os acertos definem a colheita."
+    },
+    "vi": {
+      "name": "Graft Garden",
+      "description": "Chọn tuyến cây. Mỗi mùa sáng 4 nút; số nút trúng quyết định thu hoạch."
     }
   },
   "presentation": {
     "mode": "full-iframe",
-    "hostPanels": { "openSession": false, "history": false, "status": false }
+    "hostPanels": {
+      "openSession": false,
+      "history": false,
+      "status": false
+    }
   },
   "capabilities": {
     "openSession": true,

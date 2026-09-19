@@ -7,7 +7,7 @@ import json
 ROOT = Path(__file__).resolve().parents[1]
 PUBLIC = [
     "index.html", "styles.css", "app.js", "graft-engine.js", "audio.js",
-    "bet-controls.js", "host-errors.js", "sdk-bridge.js", "game.manifest.json",
+    "bet-controls.js", "i18n.js", "host-errors.js", "sdk-bridge.js", "game.manifest.json",
     "_headers", "vercel.json", ".vercelignore", "vendor/penpal.min.js", "vendor/penpal.LICENSE.txt"
 ]
 SOURCES = [f"fruit-machine-ui/{name}" for name in PUBLIC] + [
@@ -18,6 +18,7 @@ SOURCES = [f"fruit-machine-ui/{name}" for name in PUBLIC] + [
     "scripts/graft-engine.test.cjs", "scripts/graft-browser.test.cjs", "scripts/graft-layout.test.cjs",
     "scripts/browser-runtime.cjs",
     "scripts/graft-refresh.test.cjs",
+    "scripts/graft-locales.test.cjs", "scripts/build-locales.py",
     "casino-sdk/casino-sdk/simulator/contracts/GraftGardenGame.sol",
     "casino-sdk/casino-sdk/simulator/contracts/ICasinoGameV2.sol",
     "casino-sdk/casino-sdk/simulator/scripts/verify-graft.mjs",
@@ -34,8 +35,10 @@ SOURCES = [f"fruit-machine-ui/{name}" for name in PUBLIC] + [
     "reference-analysis/GRAFT_BROWSER_VERIFICATION.json",
     "reference-analysis/GRAFT_DEPLOYMENT_VERIFICATION.json",
     "reference-analysis/GRAFT_LAYOUT_VERIFICATION.json",
+    "reference-analysis/GRAFT_LOCALES_VERIFICATION.json",
     "reference-analysis/graft-desktop.png", "reference-analysis/graft-desktop-en.png",
 ]
+SOURCES += [f"fruit-machine-ui/locales/{code}.json" for code in ["en", "de", "es", "ru", "pt", "vi", "zh"]]
 out = ROOT / "artifacts"
 out.mkdir(exist_ok=True)
 web = out / "graft-garden-web.zip"
