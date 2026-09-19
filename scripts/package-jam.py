@@ -7,18 +7,26 @@ import json
 ROOT = Path(__file__).resolve().parents[1]
 PUBLIC = [
     "index.html", "styles.css", "app.js", "graft-engine.js", "audio.js",
-    "bet-controls.js", "sdk-bridge.js", "game.manifest.json",
+    "bet-controls.js", "host-errors.js", "sdk-bridge.js", "game.manifest.json",
     "_headers", "vercel.json", ".vercelignore", "vendor/penpal.min.js", "vendor/penpal.LICENSE.txt"
 ]
 SOURCES = [f"fruit-machine-ui/{name}" for name in PUBLIC] + [
     "fruit-machine-ui/README.md", "fruit-machine-ui/sdk-bridge.test.cjs",
-    "fruit-machine-ui/audio.test.cjs", "JAM_SUBMISSION.md",
+    "fruit-machine-ui/audio.test.cjs", "fruit-machine-ui/host-errors.test.cjs", "JAM_SUBMISSION.md",
     "scripts/serve-game.py", "scripts/package-jam.py", "scripts/graft-math.cjs",
     "scripts/graft-engine.test.cjs", "scripts/graft-browser.test.cjs", "scripts/graft-layout.test.cjs",
     "scripts/browser-runtime.cjs",
+    "scripts/graft-refresh.test.cjs",
     "casino-sdk/casino-sdk/simulator/contracts/GraftGardenGame.sol",
     "casino-sdk/casino-sdk/simulator/contracts/ICasinoGameV2.sol",
     "casino-sdk/casino-sdk/simulator/scripts/verify-graft.mjs",
+    "casino-sdk/casino-sdk/simulator/src/App.tsx",
+    "casino-sdk/casino-sdk/simulator/src/config.ts",
+    "casino-sdk/casino-sdk/simulator/src/config.test.ts",
+    "casino-sdk/casino-sdk/simulator/src/SetupPanel.tsx",
+    "casino-sdk/casino-sdk/simulator/src/GameFrame.tsx",
+    "casino-sdk/casino-sdk/simulator/src/use-game-manifest.ts",
+    "casino-sdk/casino-sdk/simulator/src/fetch-game-manifest.ts",
     "reference-analysis/GRAFT_CONTRACT_VERIFICATION.json",
     "reference-analysis/GRAFT_BROWSER_VERIFICATION.json",
     "reference-analysis/GRAFT_DEPLOYMENT_VERIFICATION.json",

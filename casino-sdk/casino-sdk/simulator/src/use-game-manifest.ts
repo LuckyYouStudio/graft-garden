@@ -1,8 +1,9 @@
 import { useEffect, useState } from 'react';
 
-import { validateCasinoGameManifest, type CasinoGameManifestV1 } from '@chain/casino-sdk';
+import type { CasinoGameManifestV1 } from '@chain/casino-sdk';
 
 import type { GameIntegration } from './casino';
+import { fetchGameManifest } from './fetch-game-manifest';
 
 // A minimal, always-valid manifest used when the game origin doesn't (yet)
 // serve a `game.manifest.json`, so the bridge always hands the iframe a
@@ -21,34 +22,24 @@ function fallbackManifest(integration: GameIntegration): CasinoGameManifestV1 {
 /** Fetches + validates the game's `game.manifest.json` from its own origin. */
 export function useGameManifest(integration: GameIntegration): {
   manifest: CasinoGameManifestV1;
+  checked: boolean;
+  declaredGameId?: string;
 } {
-  const [manifest, setManifest] = useState<CasinoGameManifestV1 | null>(null);
+  const [result, setResult] = useState<{ url: string; manifest?: CasinoGameManifestV1 } | null>(null);
 
   useEffect(() => {
     if (!integration.url) return;
     let cancelled = false;
-    let manifestUrl: string;
-    try {
-      manifestUrl = new URL('game.manifest.json', integration.url).toString();
-    } catch {
-      // Not a valid URL (mid-typing in the setup panel) — keep the fallback.
-      return;
-    }
-    void (async () => {
-      try {
-        const response = await fetch(manifestUrl);
-        if (!response.ok) return;
-        const result = validateCasinoGameManifest((await response.json()) as unknown);
-        if (!cancelled && result.ok) setManifest(result.manifest);
-      } catch {
-        // Fall through to the fallback manifest.
-      }
-    })();
+    const url = integration.url;
+    void fetchGameManifest(url).then(manifest => {
+      if (!cancelled) setResult({ url, manifest });
+    });
     return () => {
       cancelled = true;
-      setManifest(null);
     };
   }, [integration.url]);
 
-  return { manifest: manifest ?? fallbackManifest(integration) };
+  const checked = result?.url === integration.url;
+  const manifest = checked ? result?.manifest : undefined;
+  return { manifest: manifest ?? fallbackManifest(integration), checked, declaredGameId: manifest?.gameId };
 }

@@ -1,4 +1,5 @@
 import type { Address, Hex } from 'viem';
+import { canonicalCasinoGameId } from '@chain/casino-sdk';
 
 export type WalletStatusOverride = 'ready' | 'disconnected' | 'setup-required';
 
@@ -42,11 +43,16 @@ export const DEFAULT_CONFIG: SimulatorConfig = {
 };
 
 const STORAGE_KEY = 'casino-sdk-simulator.config';
+const APPLIED_STORAGE_KEY = 'casino-sdk-simulator.applied-config';
 
 export function loadConfig(): SimulatorConfig {
   let stored: Partial<SimulatorConfig> = {};
   try {
-    stored = JSON.parse(localStorage.getItem(STORAGE_KEY) ?? '{}') as Partial<SimulatorConfig>;
+    // Older builds persisted unfinished setup edits here. Prefer the last
+    // applied configuration so a page reload resumes the running game.
+    stored = JSON.parse(
+      localStorage.getItem(APPLIED_STORAGE_KEY) ?? localStorage.getItem(STORAGE_KEY) ?? '{}',
+    ) as Partial<SimulatorConfig>;
   } catch {
     stored = {};
   }
@@ -58,12 +64,70 @@ export function loadConfig(): SimulatorConfig {
   const rpc = params.get('rpc');
   if (rpc) config.rpcUrl = rpc;
   const gameAddress = params.get('gameAddress');
-  if (gameAddress) config.gameAddress = gameAddress as Address;
+  if (gameAddress) {
+    if (gameAddress.toLowerCase() !== config.gameAddress.toLowerCase()) config.gameName = 'SimulatedGame';
+    config.gameAddress = gameAddress as Address;
+  }
   return config;
 }
 
 export function saveConfig(config: SimulatorConfig): void {
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(config));
+  localStorage.setItem(APPLIED_STORAGE_KEY, JSON.stringify(config));
+}
+
+/** Keep share/reload links in sync only when a new configuration is applied. */
+export function saveAppliedUrl(config: SimulatorConfig): void {
+  const url = new URL(location.href);
+  url.searchParams.set('game', config.gameUrl);
+  url.searchParams.set('rpc', config.rpcUrl);
+  url.searchParams.set('gameAddress', config.gameAddress);
+  history.replaceState(null, '', url);
+}
+
+export function manifestMismatch(gameName: string, manifestGameId: string): string | undefined {
+  if (canonicalCasinoGameId(gameName) === canonicalCasinoGameId(manifestGameId)) return;
+  return `Game contract mismatch: the page declares ${manifestGameId}, but the selected contract is ${gameName}. Select the matching game contract and restart the harness.`;
+}
+
+/** Match names and addresses together; never label an explicit address as the first game. */
+export function resolveLocalConfig(
+  current: SimulatorConfig,
+  contracts: LocalDeployedContracts,
+  manifestGameId: string | undefined,
+  preserveGameAddress: boolean,
+): { config: SimulatorConfig; notice?: string } {
+  const selected = contracts.games.find(
+    game => game.address.toLowerCase() === current.gameAddress.toLowerCase(),
+  );
+  const matching = manifestGameId
+    ? contracts.games.find(game => canonicalCasinoGameId(game.name) === canonicalCasinoGameId(manifestGameId))
+    : undefined;
+  // A saved selection may belong to the previous page, or a previous node
+  // deployment. A manifest match repairs it, except for a deliberate address.
+  const game = preserveGameAddress && current.gameAddress
+    ? selected
+    : matching ?? selected ?? (!current.gameAddress ? contracts.games[0] : undefined);
+  const gameAddress = game?.address ?? current.gameAddress;
+  const gameName = game?.name ?? current.gameName;
+  if (manifestGameId && gameName !== 'SimulatedGame') {
+    const mismatch = manifestMismatch(gameName, manifestGameId);
+    if (mismatch) throw new Error(mismatch);
+  }
+  const changed = gameAddress.toLowerCase() !== current.gameAddress.toLowerCase();
+  return {
+    config: {
+      ...current,
+      proxy: contracts.host,
+      token: contracts.token,
+      liquidityVault: contracts.vault,
+      rpcUrl: current.rpcUrl === DEFAULT_CONFIG.rpcUrl && contracts.rpcUrl ? contracts.rpcUrl : current.rpcUrl,
+      gameAddress,
+      gameName,
+    },
+    notice: matching && changed
+      ? `Matched the page manifest to ${matching.name}. The previous contract selection was replaced before starting.`
+      : undefined,
+  };
 }
 
 export type LocalDeployedContracts = {

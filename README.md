@@ -99,9 +99,12 @@ npm install --no-save --package-lock=false playwright
 npx playwright install chromium
 node scripts/graft-browser.test.cjs
 node scripts/graft-layout.test.cjs
+node scripts/graft-refresh.test.cjs
 ```
 
 也可设置 `PLAYWRIGHT_MODULE` 与 `CHROMIUM_PATH` 使用已有安装。仓库保留 SDK 自带的公开本地测试账户；本地部署文件、运行日志、依赖目录与环境变量文件不进入版本控制。
+
+刷新回归覆盖整个模拟器页面刷新后恢复原局、继续下一局、旧合约缓存与未应用配置。模拟器只保存已点击 Restart 的配置；启动时会检查页面清单与合约是否匹配。设置 `GAME_URL=https://graft-garden.vercel.app/` 可对线上前端执行同一套本地链测试。
 
 公开托管时上传整个 `fruit-machine-ui` 目录，并保留清单的 CORS 响应头与 iframe 嵌入能力。项目附带 `_headers` 和 `vercel.json` 配置。参赛材料及外部步骤见 [Chain Jam 提交说明](JAM_SUBMISSION.md)，官方要求见 [Chain Jam](https://jam.chain.wtf/#submit)。
 

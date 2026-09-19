@@ -51,6 +51,8 @@ export function SetupPanel({
   running,
   onApply,
   status,
+  notice,
+  starting,
 }: {
   config: SimulatorConfig;
   onChange: (config: SimulatorConfig) => void;
@@ -58,6 +60,8 @@ export function SetupPanel({
   running: boolean;
   onApply: () => void;
   status: string;
+  notice?: string;
+  starting?: boolean;
 }) {
   const set = <K extends keyof SimulatorConfig>(key: K, value: SimulatorConfig[K]) =>
     onChange({ ...config, [key]: value });
@@ -65,6 +69,7 @@ export function SetupPanel({
   return (
     <div className="flex h-full flex-col gap-3 overflow-y-auto p-4">
       <p className="text-xs leading-relaxed text-neutral-400">{status}</p>
+      {notice && <p role="status" className="text-xs leading-relaxed text-amber-300">{notice}</p>}
 
       <Field
         label="Game URL"
@@ -103,6 +108,9 @@ export function SetupPanel({
             }}
           >
             <option value="">— pick a deployed game —</option>
+            {config.gameAddress && !detected.games.some(game => game.address.toLowerCase() === config.gameAddress.toLowerCase()) && (
+              <option value={config.gameAddress}>Custom contract ({config.gameAddress.slice(0, 10)}…)</option>
+            )}
             {detected.games.map(game => (
               <option key={game.address} value={game.address}>
                 {game.name} ({game.address.slice(0, 10)}…)
@@ -180,6 +188,7 @@ export function SetupPanel({
         type="button"
         className="mt-1 cursor-pointer rounded-md bg-indigo-600 px-3 py-2 text-sm font-medium text-white hover:bg-indigo-500"
         onClick={onApply}
+        disabled={starting}
       >
         {running ? 'Restart harness' : 'Start harness'}
       </button>

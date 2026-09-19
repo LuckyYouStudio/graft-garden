@@ -83,6 +83,11 @@ const handled = new Set();
 const reducedMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
 const pause = ms => new Promise(resolve => setTimeout(resolve, reducedMotion ? 1 : ms));
 function sound(name, arg) { try { window.FruitAudio?.[name]?.(arg); } catch {} }
+function hostErrorMessage(error) { return window.GraftHostErrors.message(error, locale); }
+function reportHostError(error) {
+  console.warn('Graft Garden host request:', error);
+  status('failed', {error:hostErrorMessage(error)}, true);
+}
 function busy() { return stage !== 'idle'; }
 function context() {
   const d = hosted ? snapshot?.token?.decimals : 2;
@@ -331,7 +336,7 @@ async function runHost() {
     await waitForRound(round);
   } catch(error) {
     // No local debit or refund in host mode. The host is always authoritative.
-    stage='idle'; status('failed',{error:error.message},true); renderNumbers();
+    stage='idle'; reportHostError(error); renderNumbers();
     recoverSnapshot();
   }
 }
@@ -344,7 +349,7 @@ function recoverSnapshot() {
     const row=rows.find(r=>r.sessionKey===saved?.key) || rows.find(r=>r.phase===1 || r.phase===2);
     if(!row) return;
     const round=rowRound(row); activeRound=round; savePending(round); stage='waiting'; status('restored'); renderNumbers(); void waitForRound(round);
-  } catch(error) { status('failed',{error:error.message},true); }
+  } catch(error) { reportHostError(error); }
   finally { recovering=false; }
 }
 function receiveSnapshot(value) {
@@ -394,11 +399,11 @@ async function showVerification() {
       const verification=await bridge.getHostApi().getRandomnessVerification({sessionId:lastRow.sessionId});
       paragraph(t(!verification.supported?'noVrf':verification.requests?.length && verification.requests.every(r=>r.valid)?'verified':'unverified'));
       details.verification=verification;
-    } catch(error) { paragraph(t('failed',{error:error.message})); }
+    } catch(error) { paragraph(t('failed',{error:hostErrorMessage(error)})); }
   } else paragraph(t(lastRow?'verifyUnavailable':'standalone'));
   const pre=document.createElement('pre'); pre.textContent=JSON.stringify(details,null,2); $('#dialogBody').append(pre);
 }
-$('#startButton').addEventListener('click',()=>{ void start().catch(error=>{ stage='idle';status('failed',{error:error.message},true);renderNumbers(); }); });
+$('#startButton').addEventListener('click',()=>{ void start().catch(error=>{ stage='idle';reportHostError(error);renderNumbers(); }); });
 $('#previewButton').addEventListener('click',()=>{void preview();});
 $('#clearBetsButton').addEventListener('click',()=>{ if(busy())return; betControls.cancel();counts.fill(0);renderNumbers();renderPaths();sound('click');toast('cleared'); });
 $('#harvestButton').addEventListener('click',()=>{if(!busy()){mode='harvest';renderNumbers();renderPaths();}});
@@ -411,7 +416,7 @@ $('#cancelButton').addEventListener('click',async()=>{
   if(!activeRound?.sessionId || stage!=='waiting-retry')return;
   $('#cancelButton').disabled=true;
   try {await bridge.cancelStuckRandomness(activeRound.sessionId);stage='waiting';status('pending');void waitForRound(activeRound);}
-  catch(error){status('failed',{error:error.message},true);} renderNumbers();
+  catch(error){reportHostError(error);} renderNumbers();
 });
 $('#languageButton').addEventListener('click',()=>{const menu=$('#languageMenu');menu.hidden=!menu.hidden;$('#languageButton').setAttribute('aria-expanded',String(!menu.hidden));});
 $$('[data-locale]').forEach(button=>button.addEventListener('click',()=>{
@@ -423,4 +428,4 @@ $('#closeDialog').addEventListener('click',()=>$('#infoDialog').close());
 $('#infoDialog').addEventListener('click',event=>{if(event.target===$('#infoDialog'))$('#infoDialog').close();});
 document.addEventListener('keydown',event=>{if(event.code==='Space' && !event.repeat && !$('#infoDialog').open && !event.target.closest('button,input,textarea,select')){event.preventDefault();void start();}});
 renderBoard(); applyLocale();
-bridge=window.FruitCasinoBridge.create({onSnapshot:receiveSnapshot,onReady:()=>{renderNumbers();recoverSnapshot();},onError:error=>{status('failed',{error:error.message},true);renderNumbers();}});
+bridge=window.FruitCasinoBridge.create({onSnapshot:receiveSnapshot,onReady:()=>{renderNumbers();recoverSnapshot();},onError:error=>{reportHostError(error);renderNumbers();}});

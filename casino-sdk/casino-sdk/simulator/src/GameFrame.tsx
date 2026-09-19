@@ -2,8 +2,10 @@
 // bridge wiring, and vertical sizing hooks — minus production-only chrome
 // (smart vault overlay, session timing panel).
 import { useEffect, useState } from 'react';
+import type { CasinoGameManifestV1 } from '@chain/casino-sdk';
 
 import type { WalletStatusOverride } from './config';
+import { manifestMismatch } from './config';
 import type { GameIntegration } from './casino';
 import type { SimulatorRuntime } from './runtime';
 import { useGameManifest } from './use-game-manifest';
@@ -23,7 +25,30 @@ export function GameFrame({
   walletStatus: WalletStatusOverride;
   onContentSize?: (minHeight: number) => void;
 }) {
-  const { manifest } = useGameManifest(integration);
+  const { manifest, checked, declaredGameId } = useGameManifest(integration);
+  const mismatch = declaredGameId && integration.gameName !== 'SimulatedGame'
+    ? manifestMismatch(integration.gameName, declaredGameId)
+    : undefined;
+  if (!checked || mismatch) {
+    return (
+      <div role={mismatch ? 'alert' : 'status'} className="absolute inset-0 flex flex-col items-center justify-center gap-2 p-6 text-center">
+        <p className="text-sm font-medium text-neutral-300">{mismatch ? 'Game contract mismatch' : 'Checking game manifest…'}</p>
+        {mismatch && <p className="max-w-lg text-xs text-amber-300">{mismatch}</p>}
+      </div>
+    );
+  }
+  // Do not mount a guest or expose betting methods until its declared game
+  // identity has been checked against the selected integration.
+  return <ConnectedGameFrame runtime={runtime} integration={integration} walletStatus={walletStatus} onContentSize={onContentSize} manifest={manifest} />;
+}
+
+function ConnectedGameFrame({ runtime, integration, walletStatus, onContentSize, manifest }: {
+  runtime: SimulatorRuntime;
+  integration: GameIntegration;
+  walletStatus: WalletStatusOverride;
+  onContentSize?: (minHeight: number) => void;
+  manifest: CasinoGameManifestV1;
+}) {
   const [iframe, setIframe] = useState<HTMLIFrameElement | null>(null);
   const availableHeight = useAvailableGameHeight(iframe);
   const { reportedContentHeight, reportContentHeight } = useReportedContentHeight(iframe);

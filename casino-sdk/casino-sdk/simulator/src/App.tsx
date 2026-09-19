@@ -1,10 +1,12 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 
 import {
-  DEFAULT_CONFIG,
   fetchLocalDeployedContracts,
   loadConfig,
   saveConfig,
+  saveAppliedUrl,
+  resolveLocalConfig,
+  manifestMismatch,
   type LocalDeployedContracts,
   type SimulatorConfig,
 } from './config';
@@ -13,6 +15,7 @@ import { createSimulatorRuntime, type SimulatorRuntime } from './runtime';
 import { GameViewport } from './GameViewport';
 import { SetupPanel } from './SetupPanel';
 import ChainSmallLogo from './ChainSmallLogo';
+import { fetchGameManifest } from './fetch-game-manifest';
 
 const PANEL_COLLAPSED_KEY = 'casino-sdk-simulator.panel-collapsed';
 
@@ -23,6 +26,9 @@ export function App() {
   const [runtime, setRuntime] = useState<SimulatorRuntime | undefined>(undefined);
   const [error, setError] = useState<string | undefined>(undefined);
   const [starting, setStarting] = useState(false);
+  const [resolving, setResolving] = useState(false);
+  const [setupNotice, setSetupNotice] = useState<string | undefined>();
+  const explicitAddressRef = useRef(Boolean(new URLSearchParams(location.search).get('gameAddress')));
   const [collapsed, setCollapsed] = useState(() => {
     const stored = localStorage.getItem(PANEL_COLLAPSED_KEY);
     if (stored !== null) return stored === 'true';
@@ -38,8 +44,16 @@ export function App() {
   };
 
   useEffect(() => {
-    saveConfig(config);
-  }, [config]);
+    if (!appliedConfig) return;
+    // These three controls are live. Other edits stay a draft until Restart;
+    // refreshing must not accidentally switch the running game or contract.
+    saveConfig({
+      ...appliedConfig,
+      walletStatus: config.walletStatus,
+      flashblockLagMs: config.flashblockLagMs,
+      indexerLagMs: config.indexerLagMs,
+    });
+  }, [appliedConfig, config.walletStatus, config.flashblockLagMs, config.indexerLagMs]);
 
   useEffect(() => {
     localStorage.setItem(PANEL_COLLAPSED_KEY, String(collapsed));
@@ -76,26 +90,20 @@ export function App() {
       if (autoFilled) return;
       autoFilled = true;
       const current = configRef.current;
-      const merged: SimulatorConfig = {
-        ...current,
-        // The local node owns the host infrastructure and redeploys it per
-        // boot, so its fresh addresses always replace saved ones; the game
-        // address stays the developer's choice once set.
-        proxy: contracts.host,
-        token: contracts.token,
-        liquidityVault: contracts.vault,
-        rpcUrl:
-          current.rpcUrl === DEFAULT_CONFIG.rpcUrl && contracts.rpcUrl
-            ? contracts.rpcUrl
-            : current.rpcUrl,
-        gameAddress: current.gameAddress || (contracts.games[0]?.address ?? ''),
-        gameName:
-          current.gameName === 'SimulatedGame' && contracts.games[0]
-            ? contracts.games[0].name
-            : current.gameName,
-      };
-      setConfig(merged);
-      setAppliedConfig(previous => previous ?? merged);
+      setResolving(true);
+      try {
+        const manifest = await fetchGameManifest(current.gameUrl);
+        if (cancelled) return;
+        const resolved = resolveLocalConfig(current, contracts, manifest?.gameId, explicitAddressRef.current);
+        setConfig(resolved.config);
+        setSetupNotice(resolved.notice);
+        saveAppliedUrl(resolved.config);
+        setAppliedConfig(previous => previous ?? resolved.config);
+      } catch (setupError) {
+        if (!cancelled) setError(setupError instanceof Error ? setupError.message : String(setupError));
+      } finally {
+        if (!cancelled) setResolving(false);
+      }
     };
     void poll();
     const interval = setInterval(() => void poll(), 2_000);
@@ -140,7 +148,31 @@ export function App() {
     };
   }, [appliedConfig]);
 
-  const start = () => setAppliedConfig({ ...config });
+  const start = async () => {
+    if (resolving) return;
+    setResolving(true);
+    setError(undefined);
+    setSetupNotice(undefined);
+    try {
+      const manifest = await fetchGameManifest(config.gameUrl);
+      // Restart is an explicit choice from the setup panel; never silently
+      // replace a deliberately selected contract with another deployment.
+      const next = detected
+        ? resolveLocalConfig(config, detected, manifest?.gameId, true).config
+        : { ...config };
+      if (!detected && manifest && next.gameName !== 'SimulatedGame') {
+        const mismatch = manifestMismatch(next.gameName, manifest.gameId);
+        if (mismatch) throw new Error(mismatch);
+      }
+      setConfig(next);
+      saveAppliedUrl(next);
+      setAppliedConfig(next);
+    } catch (setupError) {
+      setError(setupError instanceof Error ? setupError.message : String(setupError));
+    } finally {
+      setResolving(false);
+    }
+  };
 
   // Derived from the applied config, not the live one — edits in the panel
   // (including half-typed URLs) only reach the frame on Start/Restart.
@@ -157,11 +189,13 @@ export function App() {
 
   const status = error
     ? `error: ${error}`
-    : starting
-      ? 'starting…'
-      : runtime && integration
-        ? `chain ${runtime.chainId} · ${runtime.tokenSymbol} · player ${runtime.account.address.slice(0, 8)}…`
-        : 'not started — configure and start the harness';
+    : resolving
+      ? 'checking game manifest…'
+      : starting
+        ? 'starting…'
+        : runtime && integration
+          ? `chain ${runtime.chainId} · ${runtime.tokenSymbol} · player ${runtime.account.address.slice(0, 8)}…`
+          : 'not started — configure and start the harness';
 
   const setupPanel = (
     <SetupPanel
@@ -169,8 +203,10 @@ export function App() {
       onChange={setConfig}
       detected={detected}
       running={Boolean(runtime)}
-      onApply={start}
+      onApply={() => void start()}
       status={status}
+      notice={setupNotice}
+      starting={starting || resolving}
     />
   );
 
@@ -258,10 +294,8 @@ export function App() {
           </div>
         ) : (
           <div className="flex h-full items-center justify-center p-8">
-            <p className="max-w-lg text-sm leading-relaxed text-neutral-400">
-              Point the harness at a locally served game and a local chain, then start it. The game
-              mounts in an iframe exactly like on chain.wtf: same bridge, same snapshot, same
-              optimistic timing.
+            <p role={error ? 'alert' : 'status'} className="max-w-lg text-sm leading-relaxed text-neutral-400">
+              {error ?? (resolving ? 'Checking game manifest…' : 'Point the harness at a locally served game and a local chain, then start it. The game mounts in an iframe exactly like on chain.wtf: same bridge, same snapshot, same optimistic timing.')}
             </p>
           </div>
         )}
