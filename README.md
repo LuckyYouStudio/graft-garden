@@ -1,31 +1,33 @@
-# Graft Garden · 嫁接果园
+# Graft Garden
 
-**[在线试玩 · Play now](https://graft-garden.vercel.app)**
+**English** | [简体中文](README.zh-CN.md)
 
-三季风向、八条果树路径的原创下注游戏，为 Chain Jam 制作。玩家分配路径下注，选择收成模式与嫁接布局，再观察三季节点依次点亮并结算。两种模式、两种布局及任意合法下注组合的理论 **RTP 均为 97%**。
+**[Play the live demo](https://graft-garden.vercel.app/)** · [Source code](https://github.com/LuckyYouStudio/graft-garden)
 
-![Graft Garden 游戏界面](reference-analysis/graft-desktop.png)
+Graft Garden is an original wagering game built for Chain Jam: eight fruit paths grow through three seasons of independent winds. Allocate your bets, choose a payout mode and a path layout, then watch the orchard light up and reveal your harvest. Both modes, both layouts, and every valid bet allocation have a **97% theoretical return to player (RTP)**.
 
-- 中文 / English 界面，支持桌面和手机。
-- 桌面使用果园与操作区双栏，手机使用紧凑单列；常见屏幕主要信息首屏可见，极小屏和矮横屏可滚动。模拟器中按宿主可用高度布局。
-- 八路下注默认零；支持长按加注、清除下注及收取奖励。
-- 格架 / 嫁接布局改变路径之间的关联；稳态收成 / 共振绽放提供不同返还分布。
-- 包含 Chain casino SDK 合约、Penpal 桥接、游戏清单及 Jam widget。
-- 静态页面可独立试玩；在官方模拟器中嵌入时使用 Host 与合约的权威结算结果。
+![Graft Garden game interface](reference-analysis/graft-desktop-en.png)
 
-## 快速开始
+- English and Chinese interfaces, with desktop and mobile layouts.
+- A two-column orchard and control panel on desktop, and a compact single column on phones. Main controls stay visible on common screens; very small screens and short landscape viewports can scroll. The simulator view adapts to the host's available height.
+- Eight betting lanes start at zero. Press and hold to add bets, clear all bets, or collect a completed harvest.
+- Trellis and Graft layouts change how paths hit together. Harvest and Bloom modes offer different payout distributions.
+- Includes a Chain casino SDK contract, Penpal bridge, game manifest, and Jam widget.
+- Runs as a standalone static demo. When embedded in the official simulator, the game uses authoritative settlement results from the host and contract.
 
-需要 Python 3；SDK 联调还需 Node.js 与 npm。先在仓库根目录启动前端：
+## Quick start
+
+Python 3 is required for the development server. SDK testing also requires Node.js and npm. Start the frontend from the repository root:
 
 ```sh
 python scripts/serve-game.py
 ```
 
-打开 [本地试玩](http://localhost:4199/)。前端无需构建，独立试玩使用模拟余额。开发服务器已配置模拟器读取清单所需的 CORS 响应头。
+Open the [local demo](http://localhost:4199/). The frontend needs no build step, and standalone play uses a simulated balance. The development server includes the CORS headers needed for the simulator to read the game manifest.
 
-页面统一使用「余额 / Balance」。独立试玩初始提供 1,000,000 虚拟积分，参考官方 SDK 模拟器的测试额度；Jam 规则本身没有指定试玩余额数字。SDK 模式只显示主机提供的 `balances.smartVaultBalance`，不会由前端初始化或重置。
+The balance is labeled **Balance / 余额** in both modes. Standalone play starts with **1,000,000 virtual credits**, following the SDK simulator's test allocation; Chain Jam does not mandate a specific demo balance. SDK mode displays the host's `balances.smartVaultBalance` and never initializes or resets that balance in the frontend.
 
-另开终端启动仓库内的 SDK：
+Start the bundled SDK in a second terminal:
 
 ```sh
 cd casino-sdk/casino-sdk
@@ -33,49 +35,71 @@ npm ci
 npm start
 ```
 
-打开 [官方本地模拟器](http://localhost:3300/)，在设置中选择 `GraftGardenGame`，游戏 URL 填写 `http://localhost:4199/`，并保持两个服务运行。本地链的部署地址由启动流程生成，记录于 `simulator/local-node/deployed.json`。
+Open the [official local simulator](http://localhost:3300/), select `GraftGardenGame`, and set the game URL to `http://localhost:4199/`. Keep both services running. The startup process generates local contract addresses and records them in `simulator/local-node/deployed.json`.
 
-**本地模拟器使用测试代币，不代表正式链部署、公开托管或 Chain 平台上架。** 详细接入说明见 [前端与 SDK 文档](fruit-machine-ui/README.md)。
+**The local simulator uses test tokens. A successful local session is not a production-chain deployment or a listing on Chain.** The public Vercel URL is a hosted demo. See the [frontend and SDK guide](fruit-machine-ui/README.md) for more integration details (Chinese).
 
-## 玩法与返奖率
+## How to play
 
-每季随机点亮八个节点中的连续四个，每条路径在该季经过一个节点。三季风向独立，所以单路径每季的命中概率均为 `1/2`。最终按累计命中数返还：
+1. Choose **Harvest** or **Bloom**, then choose the **Trellis** or **Graft** path layout.
+2. Add a stake to one or more of the eight fruit paths. Hold a fruit button to keep adding bets.
+3. Start the harvest. Each season's independent wind lights four consecutive nodes on an eight-node ring; each path passes through one node per season.
+4. A path's total hits across all three seasons determine its payout using the table below.
 
-| 三季命中数 | 概率 | 稳态收成 · Harvest | 共振绽放 · Bloom |
+The layout changes which nodes each path visits and how different paths win together. It does not change any individual path's expected return.
+
+## Paytable and 97% RTP
+
+A path has a `1/2` chance to hit in each independent season. Its total hit count therefore follows a binomial distribution:
+
+| Hits across three seasons | Probability | Harvest payout | Bloom payout |
 | --- | ---: | ---: | ---: |
 | 0 | 1/8 | 0 | 0 |
 | 1 | 3/8 | 0 | 0 |
 | 2 | 3/8 | 1.52× | 0 |
 | 3 | 1/8 | 3.20× | 7.76× |
 
-倍率是对应路径下注的**总返还，包含本金**：
+Multipliers are the **total amount returned on that path's stake, including the stake**:
 
 ```text
 Harvest RTP = 3/8 × 1.52 + 1/8 × 3.20 = 97%
 Bloom RTP   = 1/8 × 7.76              = 97%
 ```
 
-布局改变多路径的共同命中情况，不改变每条路径的期望。合约要求每条下注为 `25` 个 token 最小单位的整数倍，以保证返还精确。RTP 是理论平均返还比例，不是单局中奖率。
+Since every path has the same expected return, any valid combination of stakes also has a 97% theoretical RTP. The contract requires each stake to be a multiple of `25` token base units so that payout calculations remain exact. RTP is a long-run theoretical average, not the probability of winning an individual round.
 
-## 项目结构
+The independent reference model enumerates all `8³ = 512` wind combinations and checks the expected return, payout caps, and hit distributions. Its paytable matches the frontend engine and Solidity contract.
 
-| 路径 | 内容 |
+## Project structure
+
+| Path | Purpose |
 | --- | --- |
-| [fruit-machine-ui/](fruit-machine-ui/) | 静态界面、三季动画、音效、双语与独立试玩 |
-| [graft-engine.js](fruit-machine-ui/graft-engine.js) | 路径模型与精确奖表 |
-| [sdk-bridge.js](fruit-machine-ui/sdk-bridge.js) | Guest / Host 桥接、ABI 编解码及会话恢复 |
-| [game.manifest.json](fruit-machine-ui/game.manifest.json) | Chain SDK 游戏清单 |
-| [GraftGardenGame.sol](casino-sdk/casino-sdk/simulator/contracts/GraftGardenGame.sol) | `ICasinoGameV2` 合约、风险报价与随机数结算 |
-| [casino-sdk/casino-sdk/](casino-sdk/casino-sdk/) | SDK、本地链、VRF 网络及模拟器 |
-| [scripts/](scripts/) | 开发服务器、数学枚举与验证脚本 |
-| [reference-analysis/](reference-analysis/) | 验证报告及界面截图 |
-| [JAM_SUBMISSION.md](JAM_SUBMISSION.md) | 参赛提案、数学说明与提交步骤 |
+| [fruit-machine-ui/](fruit-machine-ui/) | Static interface, three-season animation, sound, localization, and standalone demo |
+| [graft-engine.js](fruit-machine-ui/graft-engine.js) | Path model and exact paytable |
+| [sdk-bridge.js](fruit-machine-ui/sdk-bridge.js) | Guest/host bridge, ABI encoding and decoding, and session recovery |
+| [game.manifest.json](fruit-machine-ui/game.manifest.json) | Chain SDK game manifest |
+| [GraftGardenGame.sol](casino-sdk/casino-sdk/simulator/contracts/GraftGardenGame.sol) | `ICasinoGameV2` contract, risk quotes, and randomness settlement |
+| [casino-sdk/casino-sdk/](casino-sdk/casino-sdk/) | SDK, local chain, VRF network, and simulator |
+| [scripts/](scripts/) | Development server, mathematical enumeration, and verification scripts |
+| [reference-analysis/](reference-analysis/) | Verification reports and interface screenshots |
+| [JAM_SUBMISSION.md](JAM_SUBMISSION.md) | Jam pitch, mathematical notes, and submission steps |
 
-目录名 `fruit-machine-ui` 沿用早期原型。旧 `FruitTigerGame.sol`、`engine.js` 和水果机设计资料仅为历史参考，不属于当前 Graft Garden 的奖表。
+The directory name `fruit-machine-ui` comes from an earlier prototype. `FruitTigerGame.sol`, `engine.js`, and the old fruit-machine design materials are historical references and do not define the current Graft Garden paytable.
 
-## 验证
+## Chain casino SDK integration
 
-在仓库根目录运行数学、前端模型及桥接检查：
+- **Contract:** `GraftGardenGame.sol` implements `ICasinoGameV2`, validates wagers, quotes risk and payout caps, and settles outcomes from supplied randomness.
+- **Bridge:** The Penpal guest connects to the host, opens sessions, receives authoritative results, and reveals the outcome after the game animation. It supports recovery of interrupted sessions and cancellation of stuck randomness.
+- **Manifest:** `game.manifest.json` declares `GraftGardenGame`, English and Chinese locales, the full-iframe presentation, and supported capabilities.
+- **Standalone mode:** The public demo works outside the Chain iframe with virtual credits. Host integration uses the host's balance and contract settlement instead.
+
+Full-page refresh recovery preserves the original session ID and keeps betting disabled while the session is synchronizing. The simulator publishes historical logs only after they have been fully parsed, checks the game's manifest against the selected contract at startup, and persists only configurations applied with **Restart harness**. This prevents stale `FruitTigerGame` settings or partially synchronized history from being used for a new round.
+
+These are local integration capabilities, not a claim of a production-chain deployment, external security audit, or acceptance by the Jam organizers.
+
+## Verification
+
+Run the mathematical, frontend-model, and bridge checks from the repository root:
 
 ```sh
 node scripts/graft-math.cjs
@@ -86,16 +110,16 @@ node --check fruit-machine-ui/app.js
 npm --prefix casino-sdk/casino-sdk/simulator run compile-contracts
 ```
 
-保持 SDK 本地栈运行后，可验证合约结果和真实本地会话：
+With the local SDK stack running, verify contract results and local on-chain sessions:
 
 ```sh
 cd casino-sdk/casino-sdk/simulator
 node scripts/verify-graft.mjs
 ```
 
-数学模型枚举全部 `8³ = 512` 种风向组合。已有本地验证记录见 [合约报告](reference-analysis/GRAFT_CONTRACT_VERIFICATION.json) 和 [浏览器联调报告](reference-analysis/GRAFT_BROWSER_VERIFICATION.json)；这些报告不代表生产部署或主办方审核。
+Saved results are available in the [contract verification report](reference-analysis/GRAFT_CONTRACT_VERIFICATION.json) and [browser integration report](reference-analysis/GRAFT_BROWSER_VERIFICATION.json). These reports document local checks; they are not production deployment records or organizer approval.
 
-浏览器检查需要 Playwright。保持前端和 SDK 服务运行，在仓库根目录执行：
+Browser checks require Playwright. Keep the frontend and SDK services running, then execute these commands from the repository root:
 
 ```sh
 npm install --no-save --package-lock=false playwright
@@ -105,27 +129,37 @@ node scripts/graft-layout.test.cjs
 node scripts/graft-refresh.test.cjs
 ```
 
-也可设置 `PLAYWRIGHT_MODULE` 与 `CHROMIUM_PATH` 使用已有安装。仓库保留 SDK 自带的公开本地测试账户；本地部署文件、运行日志、依赖目录与环境变量文件不进入版本控制。
+You can set `PLAYWRIGHT_MODULE` and `CHROMIUM_PATH` to use an existing installation. The repository includes the SDK's public local test accounts. Local deployment state, runtime logs, dependencies, and environment files are excluded from version control.
 
-布局检查可通过 `CHECK_SIMULATOR=1` 加入官方模拟器 iframe 场景，`GAME_URL` 可指定公开试玩地址。检查覆盖中英文屏幕尺寸、长金额历史记录、按钮点击区域与可视范围；记录见 [布局验证报告](reference-analysis/GRAFT_LAYOUT_VERIFICATION.json)。
+Set `CHECK_SIMULATOR=1` to include the official simulator iframe in layout checks. Set `GAME_URL` to test a different frontend, including `https://graft-garden.vercel.app/`. Layout checks cover English and Chinese viewport sizes, long monetary values in history, touch targets, and visible controls; see the [layout verification report](reference-analysis/GRAFT_LAYOUT_VERIFICATION.json).
 
-刷新回归覆盖整个模拟器页面刷新后恢复原局、继续下一局、旧合约缓存与未应用配置。模拟器只保存已点击 Restart 的配置；启动时会检查页面清单与合约是否匹配。历史日志完整解析后才发布，页面恢复时锁定原会话编号，等待同步期间保持下注禁用。设置 `GAME_URL=https://graft-garden.vercel.app/` 可对线上前端执行同一套本地链测试。回归测试使用独立的本地测试账户。
+The refresh regression suite covers a full simulator-page reload during a round, recovery of that round, playing the next round, stale contract settings, and configuration changes that have not been applied. It uses separate local test accounts. With `GAME_URL=https://graft-garden.vercel.app/`, the same local-chain checks exercise the hosted frontend.
 
-公开托管时上传整个 `fruit-machine-ui` 目录，并保留清单的 CORS 响应头与 iframe 嵌入能力。项目附带 `_headers` 和 `vercel.json` 配置。参赛材料及外部步骤见 [Chain Jam 提交说明](JAM_SUBMISSION.md)，官方要求见 [Chain Jam](https://jam.chain.wtf/#submit)。
+## Vercel deployment
 
-## Vercel 部署
+The frontend is entirely static. When importing this repository into Vercel, set **Root Directory** to `fruit-machine-ui` and **Framework Preset** to **Other**. The directory's `vercel.json` skips installation and building, publishes the static files directly, and permits cross-origin access to the game manifest.
 
-在 Vercel 导入此仓库时，将 **Root Directory** 设为 `fruit-machine-ui`，框架选择 **Other**。该目录中的 `vercel.json` 已设置跳过安装和构建、直接发布静态文件，并允许主机跨域读取游戏清单。
+The production project is connected to this GitHub repository. New commits to `main` automatically deploy to [graft-garden.vercel.app](https://graft-garden.vercel.app/).
 
-生产项目已连接此 GitHub 仓库，`main` 分支的新提交会自动发布到上方试玩地址；项目根目录为 `fruit-machine-ui`。
-
-如需通过 CLI 手动发布，在完成登录后从仓库根目录链接现有项目：
+To deploy manually with the CLI, log in and link the existing project from the repository root:
 
 ```sh
 npx vercel link --yes --scope luck-you --project graft-garden
 npx vercel deploy --prod --yes --scope luck-you
 ```
 
-报名使用公开的生产域名。部署后应在未登录 Vercel 的浏览器中检查试玩、Jam 标识、`/game.manifest.json` 及 iframe 嵌入；本地 `.vercel` 连接信息不会提交到 Git。
+The `luck-you` scope and `graft-garden` project identify this deployment; use your own scope and project when deploying a fork. Local `.vercel` connection details are not committed to Git.
 
-公开试玩的检查记录见 [部署验证报告](reference-analysis/GRAFT_DEPLOYMENT_VERIFICATION.json)。该网址运行独立试玩；通过 Chain 主机嵌入后使用 SDK 结算。
+For other static hosts, upload the entire `fruit-machine-ui` directory and preserve the manifest's CORS headers and iframe embedding support. The repository includes `_headers` and `vercel.json` examples.
+
+After deploying, use a browser that is not signed into Vercel to check standalone play, the Jam widget, `/game.manifest.json`, and iframe embedding. See the [deployment verification report](reference-analysis/GRAFT_DEPLOYMENT_VERIFICATION.json) for recorded checks. The public URL runs the standalone demo unless it is embedded by a Chain host for SDK settlement.
+
+## Chain Jam submission
+
+- **Game title:** Graft Garden
+- **Game URL:** [https://graft-garden.vercel.app/](https://graft-garden.vercel.app/)
+- **Declared RTP:** 97%
+- **Source access:** [LuckyYouStudio/graft-garden](https://github.com/LuckyYouStudio/graft-garden)
+- **Pitch:** Wager on fruit paths across three seasons, then watch independent winds light up the orchard to reveal your harvest. Choose Trellis or Graft layouts and Harvest or Bloom payout modes, all with a mathematically verified 97% theoretical RTP.
+
+The game includes the required Jam widget. See the [submission notes](JAM_SUBMISSION.md) for the remaining submission fields and the [official Chain Jam page](https://jam.chain.wtf/#submit) for the event's requirements. Submission status and eligibility are determined by the organizers.

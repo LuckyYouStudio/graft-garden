@@ -46,7 +46,7 @@ h1 { margin:2px 0 0; font-size:25px; letter-spacing:.02em; line-height:1.25; }
 .language-menu button { border:0; border-radius:6px; background:#4d315a; padding:9px; min-height:34px; font-size:12px; }
 .language-menu button:hover { background:#795585; }
 .tagline { flex:1; gap:12px; justify-content:flex-end; color:var(--muted); font-size:12px; }
-.rtp-pill { white-space:nowrap; border:1px solid #a18048; background:#4f3a31; color:#edcd84; border-radius:20px; padding:6px 10px; font-size:11px; }
+.rtp-pill { white-space:nowrap; border:1px solid #d4ac5c; background:#51402a; color:#ffe3a0; border-radius:20px; padding:6px 10px; font-size:11px; box-shadow:inset 0 1px #f4c96522; }
 .rtp-pill b { margin-left:3px; }
 .cabinet {
   display:grid; grid-template-columns:minmax(0,1fr) 350px; gap:22px;
@@ -140,6 +140,7 @@ h1 { margin:2px 0 0; font-size:25px; letter-spacing:.02em; line-height:1.25; }
 .play-row>div>span { font-size:11px; color:var(--muted); }
 .play-row strong { font-size:23px; font-variant-numeric:tabular-nums; line-height:1.2; overflow-wrap:anywhere; }
 .play-row>div>small { font-size:9px; color:#b89bbd; line-height:1.4; }
+.play-row>div>.wager-rtp { color:var(--gold); white-space:nowrap; font-weight:700; }
 #startButton {
   flex:1; min-width:140px; min-height:64px; padding:8px 12px; border:1px solid #ffe5a6; border-radius:14px;
   background:linear-gradient(#ffe49b,#e8b955 65%,#c7863c); box-shadow:0 4px 0 #805230,inset 0 1px white; color:#462333;

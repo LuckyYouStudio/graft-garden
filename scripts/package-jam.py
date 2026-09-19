@@ -11,6 +11,7 @@ PUBLIC = [
     "_headers", "vercel.json", ".vercelignore", "vendor/penpal.min.js", "vendor/penpal.LICENSE.txt"
 ]
 SOURCES = [f"fruit-machine-ui/{name}" for name in PUBLIC] + [
+    "README.md", "README.zh-CN.md",
     "fruit-machine-ui/README.md", "fruit-machine-ui/sdk-bridge.test.cjs",
     "fruit-machine-ui/audio.test.cjs", "fruit-machine-ui/host-errors.test.cjs", "JAM_SUBMISSION.md",
     "scripts/serve-game.py", "scripts/package-jam.py", "scripts/graft-math.cjs",
@@ -33,6 +34,7 @@ SOURCES = [f"fruit-machine-ui/{name}" for name in PUBLIC] + [
     "reference-analysis/GRAFT_BROWSER_VERIFICATION.json",
     "reference-analysis/GRAFT_DEPLOYMENT_VERIFICATION.json",
     "reference-analysis/GRAFT_LAYOUT_VERIFICATION.json",
+    "reference-analysis/graft-desktop.png", "reference-analysis/graft-desktop-en.png",
 ]
 out = ROOT / "artifacts"
 out.mkdir(exist_ok=True)

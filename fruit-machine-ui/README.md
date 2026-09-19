@@ -1,5 +1,7 @@
 # 嫁接果园 · Graft Garden
 
+[English project guide](../README.md) · [中文项目说明](../README.zh-CN.md)
+
 [公开试玩](https://graft-garden.vercel.app) · [源码仓库](https://github.com/LuckyYouStudio/graft-garden)
 
 Graft Garden 是为 Chain Jam 改造的三季果园游戏。玩家给八条果枝路径分配下注，选择收成模式和嫁接布局，随后揭晓三次风向并按路径命中数结算。参赛版本使用这一套玩法；此前经典水果机的停格、Lucky 送灯及猜大小不属于当前奖表。

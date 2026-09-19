@@ -11,7 +11,7 @@ const words = {
     prize:'本局收成', garden:'三季果园 · 8 条路径', spring:'01 · 生根', summer:'02 · 开花', autumn:'03 · 结果',
     harvest:'稳态收成', bloom:'共振绽放', harvestHint:'2 中 ×1.52 · 3 中 ×3.20', bloomHint:'仅 3 中 ×7.76',
     layout:'路径布局', trellis:'格架', graft:'嫁接', clear:'清除全部', total:'本局总注', preview:'风向演示',
-    verify:'结果验证', history:'最近收成', rtpNote:'97% 为长期理论返奖率，不代表单局中奖概率。赔付包含本金。',
+    verify:'结果验证', history:'最近收成', rtpTitle:'理论返奖率（RTP）', rtpNote:'97% 为长期理论返奖率，不代表单局中奖概率。赔付包含本金。',
     idle:'选择果树路径；三季各点亮 4 个节点，按路径命中次数支付收成。',
     choose:'请选择果树路径', ready:'准备好迎接三季风向', start:'开始收成', collect:'收取收成', next:'继续',
     busy:'等待风向', retry:'重新读取结果', cancel:'申请取消超时局', hold:'点击 +{unit} · 按住持续加注',
@@ -43,7 +43,7 @@ const words = {
     prize:'Round harvest', garden:'THREE SEASONS · EIGHT PATHS', spring:'01 · ROOT', summer:'02 · BLOOM', autumn:'03 · FRUIT',
     harvest:'Harvest', bloom:'Bloom', harvestHint:'2 hits ×1.52 · 3 hits ×3.20', bloomHint:'3 hits only ×7.76',
     layout:'Path layout', trellis:'Trellis', graft:'Graft', clear:'Clear all', total:'Total wager', preview:'Wind preview',
-    verify:'Verify result', history:'Recent harvests', rtpNote:'97% is a long-run theoretical return, not the chance of winning a round. Payouts include the stake.',
+    verify:'Verify result', history:'Recent harvests', rtpTitle:'Theoretical return to player (RTP)', rtpNote:'97% is a long-run theoretical return, not the chance of winning a round. Payouts include the stake.',
     idle:'Choose orchard paths. Each season lights 4 nodes; path hits determine the harvest.',
     choose:'Choose an orchard path', ready:'Ready for three seasonal winds', start:'Grow & reveal', collect:'Collect harvest', next:'Continue',
     busy:'Waiting for winds', retry:'Sync result', cancel:'Request timeout cancellation', hold:'Click +{unit} · Hold to add',
@@ -168,7 +168,12 @@ function toast(key, vars) {
 }
 function renderNumbers() {
   const ctx = context(), amount = total(), available = balance(), reason = betReason();
-  $('#rtpValue').textContent = (G.RTP_BPS / 100).toFixed(2) + '%';
+  const rtpText = (G.RTP_BPS / 100).toFixed(2) + '%';
+  $$('[data-rtp-value]').forEach(node => { node.textContent = rtpText; });
+  $$('[data-rtp-info]').forEach(node => {
+    node.title = t('rtpTitle') + ': ' + rtpText;
+    node.setAttribute('aria-label', node.title);
+  });
   const exactBalance = available === null ? '—' : format(available);
   const parts = exactBalance.split('.');
   $('#wealthValue').textContent = parts[1]?.length > 4 ? '≈' + parts[0] + '.' + parts[1].slice(0,4) : exactBalance;
