@@ -22,6 +22,8 @@ python scripts/serve-game.py
 
 打开 [本地试玩](http://localhost:4199/)。前端无需构建，独立试玩使用模拟余额。开发服务器已配置模拟器读取清单所需的 CORS 响应头。
 
+页面统一使用「余额 / Balance」。独立试玩初始提供 1,000,000 虚拟积分，参考官方 SDK 模拟器的测试额度；Jam 规则本身没有指定试玩余额数字。SDK 模式只显示主机提供的 `balances.smartVaultBalance`，不会由前端初始化或重置。
+
 另开终端启动仓库内的 SDK：
 
 ```sh

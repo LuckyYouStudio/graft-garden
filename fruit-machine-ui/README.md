@@ -23,6 +23,8 @@ Graft Garden 是为 Chain Jam 改造的三季果园游戏。玩家给八条果�
 
 ## 本地独立试玩
 
+余额标题统一为「余额 / Balance」。独立试玩每次加载初始提供 1,000,000 虚拟积分，参照 SDK 模拟器的默认测试额度；这不是 Jam 规定的固定金额。SDK 模式严格读取 `HostSnapshotV1.balances.smartVaultBalance`，由主机决定可用余额。
+
 前端是静态文件，无需构建。在仓库根目录运行：
 
 ```powershell

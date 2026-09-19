@@ -7,7 +7,7 @@ const fruit = ['🍒','🍇','🍐','🍉','🫐','🍋','🍊','🍎'];
 const colors = ['#ff9da7','#c5a0f7','#d6e792','#82dfac','#92b6ee','#f4dd84','#f5b58c','#ec8dba'];
 const words = {
   zh: {
-    title:'嫁接果园', tagline:'种下路径，等待三季风来。', balance:'试玩财富', hostBalance:'钱包余额',
+    title:'嫁接果园', tagline:'种下路径，等待三季风来。', balance:'余额', hostBalance:'余额',
     prize:'本局收成', garden:'三季果园 · 8 条路径', spring:'01 · 生根', summer:'02 · 开花', autumn:'03 · 结果',
     harvest:'稳态收成', bloom:'共振绽放', harvestHint:'2 中 ×1.52 · 3 中 ×3.20', bloomHint:'仅 3 中 ×7.76',
     layout:'路径布局', trellis:'格架', graft:'嫁接', clear:'清除全部', total:'本局总注', preview:'风向演示',
@@ -22,7 +22,7 @@ const words = {
     opening:'正在提交本局下注…', pending:'下注已提交，等待链上随机数；请勿重复下注。',
     wind:'第 {season} 季风向已锁定：从节点 {node} 开始', reveal:'三季风向到齐，正在揭示路径…',
     won:'收成 {amount} · {count} 条下注路径命中', lost:'本局下注路径未达到收成条件',
-    collected:'收成已转入试玩财富', settled:'收成已由合约结算，钱包余额以主机为准',
+    collected:'收成已转入余额', settled:'收成已由合约结算，余额以主机为准',
     cleared:'全部下注已清除', previewing:'风向演示中 · 不下注、不计入余额',
     previewDone:'演示结束 · 三季风窗与路径已显示', waitingLong:'结果尚未同步。可重新读取；超时取消由主机校验。',
     roundCancelled:'本局已取消；余额处理以合约和主机为准', roundForfeited:'本局已结束；按合约规则处理余额',
@@ -39,7 +39,7 @@ const words = {
     ruleHit:'命中次数', ruleChance:'概率', noPay:'无赔付'
   },
   en: {
-    title:'Graft Garden', tagline:'Plant a path. Let three seasons unfold.', balance:'Demo balance', hostBalance:'Wallet balance',
+    title:'Graft Garden', tagline:'Plant a path. Let three seasons unfold.', balance:'Balance', hostBalance:'Balance',
     prize:'Round harvest', garden:'THREE SEASONS · EIGHT PATHS', spring:'01 · ROOT', summer:'02 · BLOOM', autumn:'03 · FRUIT',
     harvest:'Harvest', bloom:'Bloom', harvestHint:'2 hits ×1.52 · 3 hits ×3.20', bloomHint:'3 hits only ×7.76',
     layout:'Path layout', trellis:'Trellis', graft:'Graft', clear:'Clear all', total:'Total wager', preview:'Wind preview',
@@ -54,7 +54,7 @@ const words = {
     opening:'Submitting this wager…', pending:'Wager submitted; waiting for on-chain randomness. Do not resubmit.',
     wind:'Season {season} locked: wind starts at node {node}', reveal:'All three winds are in. Revealing your paths…',
     won:'Harvest {amount} · {count} wagered paths paid', lost:'No wagered path reached the harvest threshold',
-    collected:'Harvest added to your demo balance', settled:'Settled by the contract. Wallet balance follows the host.',
+    collected:'Harvest added to your balance', settled:'Settled by the contract. Balance follows the host.',
     cleared:'All bets cleared', previewing:'Wind preview · no wager or balance change',
     previewDone:'Preview complete · seasonal windows and paths are visible', waitingLong:'Result not synced yet. Retry sync; the host checks timeout cancellation.',
     roundCancelled:'Round cancelled; balance handling follows the contract and host', roundForfeited:'Round ended under the contract rules',
@@ -76,7 +76,10 @@ try { locale = localStorage.getItem('graft.locale') === 'en' ? 'en' : 'zh'; } ca
 const t = (key, vars = {}) => Object.entries(vars).reduce((s, [k,v]) => s.replaceAll('{' + k + '}', String(v)), words[locale][key] || key);
 const counts = Array(8).fill(0);
 let mode = 'harvest', layout = 'trellis', focusLane = 0;
-let demoBalance = 66100n, prize = 0n, stage = 'idle', snapshot = null, bridge = null;
+// Standalone demo credits mirror the simulator's one-million test allowance.
+// Jam specifies no fixed demo amount; hosted balances always come from Host.
+const INITIAL_DEMO_BALANCE = 1_000_000n * 100n;
+let demoBalance = INITIAL_DEMO_BALANCE, prize = 0n, stage = 'idle', snapshot = null, bridge = null;
 let activeRound = null, lastRound = null, lastResult = null, lastRow = null, revealedSeasons = 0;
 let betControls, history = [], statusKey = 'idle', statusVars = {}, errorText = '', waitVersion = 0, recovering = false;
 const handled = new Set();
