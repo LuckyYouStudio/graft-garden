@@ -148,7 +148,7 @@ export function createSessionEventFeed(input: {
   const flashblockListeners = new Set<SessionEventListener>();
   const indexedListeners = new Set<SessionEventListener>();
   const seen = new Set<string>();
-  const blockTimestamps = new Map<bigint, number>();
+  const blockTimestamps = new Map<bigint, Promise<number>>();
   const pendingTimers = new Set<ReturnType<typeof setTimeout>>();
   let stopped = false;
   let pollTimer: ReturnType<typeof setTimeout> | undefined;
@@ -176,8 +176,14 @@ export function createSessionEventFeed(input: {
   const blockTimestamp = async (blockNumber: bigint): Promise<number> => {
     const cached = blockTimestamps.get(blockNumber);
     if (cached !== undefined) return cached;
-    const block = await publicClient.getBlock({ blockNumber });
-    const timestamp = Number(block.timestamp);
+    // Historical normalization runs in parallel. Share requests for events
+    // from the same block, while allowing a failed timestamp lookup to retry.
+    const timestamp = publicClient.getBlock({ blockNumber })
+      .then(block => Number(block.timestamp))
+      .catch(error => {
+        blockTimestamps.delete(blockNumber);
+        throw error;
+      });
     blockTimestamps.set(blockNumber, timestamp);
     return timestamp;
   };
@@ -188,8 +194,10 @@ export function createSessionEventFeed(input: {
     }
     const key = `${log.transactionHash}:${log.logIndex}`;
     if (seen.has(key)) return undefined;
+    const event = normalizeLog(log, await blockTimestamp(log.blockNumber));
+    if (seen.has(key)) return undefined;
     seen.add(key);
-    return normalizeLog(log, await blockTimestamp(log.blockNumber));
+    return event;
   };
 
   // Range-tracked getLogs polling instead of a filter-based watcher: filters
@@ -206,10 +214,14 @@ export function createSessionEventFeed(input: {
       toBlock: startBlock,
     });
     if (stopped) return;
-    for (const log of historical) {
-      const event = await normalize(log);
-      if (event) emit(indexedListeners, event);
-    }
+    // Reconstruct the entire historical snapshot before publishing any rows.
+    // Awaiting between an old Opened/Advanced and its Settled event briefly
+    // advertised finished rounds as active after a full page reload. Emitting
+    // this ordered batch synchronously prevents React/bridge snapshots from
+    // observing those intermediate history states.
+    const historyEvents = await Promise.all(historical.map(normalize));
+    if (stopped) return;
+    for (const event of historyEvents) if (event) emit(indexedListeners, event);
 
     let fromBlock = startBlock + 1n;
     const poll = async () => {

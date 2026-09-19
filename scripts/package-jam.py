@@ -27,6 +27,8 @@ SOURCES = [f"fruit-machine-ui/{name}" for name in PUBLIC] + [
     "casino-sdk/casino-sdk/simulator/src/GameFrame.tsx",
     "casino-sdk/casino-sdk/simulator/src/use-game-manifest.ts",
     "casino-sdk/casino-sdk/simulator/src/fetch-game-manifest.ts",
+    "casino-sdk/casino-sdk/simulator/src/session-events.ts",
+    "casino-sdk/casino-sdk/simulator/src/session-events.test.ts",
     "reference-analysis/GRAFT_CONTRACT_VERIFICATION.json",
     "reference-analysis/GRAFT_BROWSER_VERIFICATION.json",
     "reference-analysis/GRAFT_DEPLOYMENT_VERIFICATION.json",

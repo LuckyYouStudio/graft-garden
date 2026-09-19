@@ -300,6 +300,12 @@ async function consumeSettlement(settled, round) {
     handled.add(round.key); savePending(null); activeRound=null; stage='idle'; prize=0n;
     status(phase===5?'roundCancelled':'roundForfeited'); renderNumbers(); return;
   }
+  if (round.restoreFromHost) {
+    // Recovery starts by session key, before historical rows necessarily
+    // contain gameData. Only the settled host row supplies the restored bet.
+    Object.assign(round, rowRound(row), {restoreFromHost:false});
+    savePending(round);
+  }
   const outcome=settled.outcome;
   if(phase!==3 || !outcome || outcome.pending || !/^\d+$/.test(row.payout || '') ||
     outcome.mode!==(round.mode==='bloom'?1:0) || outcome.layoutId!==(round.layout==='graft'?1:0)) throw new Error(t('errorResult'));
@@ -346,7 +352,15 @@ function recoverSnapshot() {
   try {
     let saved=null; try { saved=JSON.parse(sessionStorage.getItem(storageKey()) || 'null'); } catch {}
     const rows=(snapshot.sessions?.items || []).filter(r=>r.gameAddress?.toLowerCase()===snapshot.integration.gameAddress.toLowerCase() && !handled.has(r.sessionKey));
-    const row=rows.find(r=>r.sessionKey===saved?.key) || rows.find(r=>r.phase===1 || r.phase===2);
+    if (typeof saved?.key === 'string' && saved.key && !handled.has(saved.key)) {
+      // Lock immediately while the host replays its history. Never replace
+      // this exact pending key with a different, partially replayed old round.
+      const round = {key:saved.key, sessionId:saved.sessionId, restoreFromHost:true, ctx:context()};
+      activeRound=round; stage='waiting'; status('restored'); renderNumbers();
+      void waitForRound(round);
+      return;
+    }
+    const row=rows.find(r=>(r.phase===1 || r.phase===2) && bridge.decodeGameData(r.raw?.gameData));
     if(!row) return;
     const round=rowRound(row); activeRound=round; savePending(round); stage='waiting'; status('restored'); renderNumbers(); void waitForRound(round);
   } catch(error) { reportHostError(error); }
@@ -359,7 +373,7 @@ function receiveSnapshot(value) {
     const row=value?.sessions?.items?.find(r=>r.sessionKey===activeRound.key);
     if(row) activeRound.sessionId=row.sessionId;
   }
-  renderNumbers(); recoverSnapshot();
+  recoverSnapshot(); renderNumbers();
 }
 async function start() {
   if(busy()) return;
@@ -428,4 +442,4 @@ $('#closeDialog').addEventListener('click',()=>$('#infoDialog').close());
 $('#infoDialog').addEventListener('click',event=>{if(event.target===$('#infoDialog'))$('#infoDialog').close();});
 document.addEventListener('keydown',event=>{if(event.code==='Space' && !event.repeat && !$('#infoDialog').open && !event.target.closest('button,input,textarea,select')){event.preventDefault();void start();}});
 renderBoard(); applyLocale();
-bridge=window.FruitCasinoBridge.create({onSnapshot:receiveSnapshot,onReady:()=>{renderNumbers();recoverSnapshot();},onError:error=>{reportHostError(error);renderNumbers();}});
+bridge=window.FruitCasinoBridge.create({onSnapshot:receiveSnapshot,onReady:()=>{recoverSnapshot();renderNumbers();},onError:error=>{reportHostError(error);renderNumbers();}});

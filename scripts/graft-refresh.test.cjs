@@ -5,6 +5,11 @@
 const { chromium, launchOptions } = require('./browser-runtime.cjs');
 const assert = require('node:assert/strict');
 const fs = require('node:fs');
+const path = require('node:path');
+const { createRequire } = require('node:module');
+const sdkRequire = createRequire(path.resolve('casino-sdk/casino-sdk/simulator/package.json'));
+const { createPublicClient, createWalletClient, http, defineChain, bytesToHex, parseAbi } = sdkRequire('viem');
+const { mnemonicToAccount } = sdkRequire('viem/accounts');
 
 const gameUrl = process.env.GAME_URL || 'http://localhost:4199/';
 const simulatorUrl = process.env.SIMULATOR_URL || 'http://localhost:3300/';
@@ -16,6 +21,24 @@ const legacy = deployed.games.find(game => game.name === 'FruitTigerGame');
 assert.ok(graft && legacy, 'Both GraftGardenGame and legacy FruitTigerGame are needed for the regression.');
 const key = 'casino-sdk-simulator.config';
 const results = [];
+// Use a different funded Hardhat account from the user's active simulator.
+const testAccount = mnemonicToAccount('test test test test test test test test test test test junk', { addressIndex: 2 });
+const testPrivateKey = bytesToHex(testAccount.getHdKey().privateKey);
+
+async function fundLocalTestAccount() {
+  const rpcUrl = deployed.rpcUrl || 'http://127.0.0.1:8545';
+  assert.ok(['localhost', '127.0.0.1', '[::1]'].includes(new URL(rpcUrl).hostname), 'Test funding only runs on a loopback node');
+  const publicClient = createPublicClient({ transport: http(rpcUrl) });
+  assert.equal(await publicClient.getChainId(), 31337, 'Test funding only runs on local Hardhat chain 31337');
+  const abi = parseAbi(['function balanceOf(address) view returns (uint256)', 'function mint(address,uint256)']);
+  const balance = await publicClient.readContract({ address: deployed.token, abi, functionName: 'balanceOf', args: [testAccount.address] });
+  if (balance >= 10000n * 10n ** 18n) return;
+  const chain = defineChain({ id: 31337, name: 'Local regression chain', nativeCurrency: { name: 'Ether', symbol: 'ETH', decimals: 18 }, rpcUrls: { default: { http: [rpcUrl] } } });
+  const wallet = createWalletClient({ account: testAccount, chain, transport: http(rpcUrl) });
+  const hash = await wallet.writeContract({ address: deployed.token, abi, functionName: 'mint', args: [testAccount.address, 1000000n * 10n ** 18n] });
+  const receipt = await publicClient.waitForTransactionReceipt({ hash });
+  assert.equal(receipt.status, 'success', 'Mint local test tokens for isolated regression account');
+}
 
 function url(address) {
   const result = new URL(simulatorUrl);
@@ -30,7 +53,7 @@ async function createPage(browser, seed = {}, motion = 'reduce') {
     if (location.origin !== origin || localStorage.getItem('graft-refresh-test-seeded')) return;
     localStorage.setItem(storageKey, JSON.stringify(seed));
     localStorage.setItem('graft-refresh-test-seeded', 'yes');
-  }, { origin: simulatorOrigin, storageKey: key, seed });
+  }, { origin: simulatorOrigin, storageKey: key, seed: { ...seed, playerPrivateKey: testPrivateKey } });
   await context.addInitScript(({ gameOrigin }) => {
     if (location.origin !== gameOrigin) return;
     window.__graftRecoveryGaps = [];
@@ -80,7 +103,12 @@ function gameFrame(page) {
 
 async function pendingRecord(page) {
   const frame = gameFrame(page);
-  await frame.waitForFunction(() => Object.keys(sessionStorage).some(key => key.startsWith('graft.pending:') && sessionStorage.getItem(key) !== 'null'), null, { timeout: 15000 });
+  try {
+    await frame.waitForFunction(() => Object.keys(sessionStorage).some(key => key.startsWith('graft.pending:') && sessionStorage.getItem(key) !== 'null'), null, { timeout: 15000 });
+  } catch (error) {
+    const diagnostic = await frame.evaluate(() => ({ status: document.querySelector('#roundStatus')?.textContent, connection: document.querySelector('#connectionLabel')?.textContent, start: document.querySelector('#startLabel')?.textContent, pending: Object.keys(sessionStorage).filter(key => key.startsWith('graft.pending:')) }));
+    throw new Error(error.message + '\nGame state: ' + JSON.stringify(diagnostic));
+  }
   return frame.evaluate(() => {
     const key = Object.keys(sessionStorage).find(key => key.startsWith('graft.pending:') && sessionStorage.getItem(key) !== 'null');
     return JSON.parse(sessionStorage.getItem(key));
@@ -113,6 +141,7 @@ async function scenario(name, run) {
 }
 
 (async () => {
+  await fundLocalTestAccount();
   const browser = await chromium.launch(launchOptions);
   try {
     for (const refreshAt of ['pending', 'animation']) {
@@ -125,7 +154,9 @@ async function scenario(name, run) {
           await env.frame.locator('#startButton').click();
           const pending = await pendingRecord(env.page);
           if (refreshAt === 'animation') {
-            await env.frame.locator('#roundStatus').filter({ hasText: /第 1 季风向已锁定|Season 1 locked/ }).waitFor({ timeout: 45000 });
+            // A text locator can miss the 250ms first-wind caption. The first
+            // revealed window is stable through the rest of the animation.
+            await gameFrame(env.page).waitForFunction(() => document.querySelector('#windSummary')?.children[0]?.classList.contains('revealed') && document.querySelector('#layoutButton')?.disabled, null, { timeout: 45000 });
           }
           await env.page.reload({ waitUntil: 'domcontentloaded' });
           await connected(env.frame);
